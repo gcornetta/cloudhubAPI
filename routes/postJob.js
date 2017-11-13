@@ -1,36 +1,48 @@
 var request = require('request');
+var multiparty = require('multiparty');
+var fs = require('fs');
 
 function postJob (req, res) {
 	var job = req.query;
-
-	checkConsulServers(job.machine, job.material, function (err, availableServers){
-        if (err){
-            res.status(500);
-            res.json(err);
-        }else{
-	        getNearestFabLab(req.db, job, availableServers, function(err, doc) {
-                if (err){
-                    res.status(500);
-                    res.json(err);
-                }else{
-                    if (doc){
-                        //TODO: Send job to pigateway and wait response
-                        sendJob(req.db, job, doc, function (err, result){
-                            if (err){
-                                res.status(500);
-                                res.json(err);
-                            }else{
-                                res.json(doc);
-                            }
-                        })
+	if (checkFields(job)){
+	var form = new multiparty.Form();
+    form.parse(req, function(err, fields, files) {
+      if (files.file){
+        job.file = files.file[0].path;
+        checkConsulServers(job.machine, job.material, function (err, availableServers){
+            if (err){
+                res.status(500);
+                res.json(err);
+            }else{
+    	        getNearestFabLab(req.db, job, availableServers, function(err, doc) {
+                    if (err){
+                        res.status(500);
+                        res.json(err);
                     }else{
-                        res.status(400);
-                        res.json({'err': 'No fablabs available'})
+                        if (doc){
+                            //TODO: Send job to pigateway and wait response
+                            sendJob(req.db, job, doc, function (err, result){
+                                if (err){
+                                    res.status(500);
+                                    res.json(err);
+                                }else{
+                                    res.json(doc);
+                                }
+                            })
+                        }else{
+                            res.status(400);
+                            res.json({'err': 'No fablabs available'})
+                        }
                     }
-                }
-            });
-	    }
-	})
+                });
+    	    }
+    	})
+      }
+    });
+    }else{
+        res.status(400);
+        res.json({'err': 'Incomplete job info'});
+    }
 }
 
 function checkConsulServers(service, tag, callback){
@@ -83,20 +95,26 @@ function getNearestFabLab(db, job, serversUp, callback){
     }, callback);
 }
 
-//TODO: Send to pigateway
 function sendJob(db, job, fablab, callback){
+    /*var formData = {file: fs.createReadStream(job.file)};
+    delete job.file;
+    var req = request.post({url: 'http://'+fablab.api +':'+ fablab.port +'/fablabs/jobs', qs: job, formData: formData}, function(err, res, body) {
+            if (err){
+                callback (err);
+            }else{*/
+                //TODO: Pigateway must return jobID and machineID
+                //TEST
+                if (!job.machineId){
+                    job.machineId = 'exampleMachine',
+                    job.id = Math.round(Math.random()*100000)+"a";
+                }
 
-    //TODO: Pigateway must return jobID and machineID
-    //TEST
-    if (!job.machineId){
-        job.machineId = 'exampleMachine',
-        job.id = Math.round(Math.random()*100000)+"a";
-    }
-
-    db.collection('fablabs').updateOne(
-        {"_id": fablab._id, "jobs.details.machineId": job.machineId},
-    	{ $push: { "jobs.details.$.jobs": job }, $inc : {"jobs.queued": 1} }
-    , callback);
+                db.collection('fablabs').updateOne(
+                    {"_id": fablab._id, "jobs.details.machineId": job.machineId},
+                 	{ $push: { "jobs.details.$.jobs": job }, $inc : {"jobs.queued": 1} }
+                , callback);
+            /*}
+        });*/
 }
 
 function checkFields (job){
