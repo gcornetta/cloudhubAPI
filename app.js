@@ -17,9 +17,11 @@ var express = require('express'),
   //ROUTES
   routes = require('./routes'),
   api = require('./routes/api'),
-  registerFabLab = require('./routes/registerFabLab').registerFabLab;
-  registerService = require('./routes/registerService').registerService;
-  submitJob = require('./routes/submitJob').submitJob;
+  postFabLab = require('./routes/postFabLab').postFabLab;
+  postService = require('./routes/postService').postService;
+  postJob = require('./routes/postJob').postJob;
+  deleteJob = require('./routes/deleteJob').deleteJob;
+  getFabLabs = require('./routes/getFabLabs').getFabLabs;
 
 var app = module.exports = express();
 
@@ -37,6 +39,9 @@ MongoClient.connect(url, function(err, db) {
  * Configuration
  */
 app.use(function (req, res, next) {
+   res.header('Access-Control-Allow-Origin', '*');
+   res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,PATCH,OPTIONS');
+   res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
    req.db = globalDB;
    next();
 });
@@ -72,9 +77,12 @@ app.get('/', routes.index);
 app.get('/partials/:name', routes.partials);
 // JSON API
 app.get('/api/name', api.name);
-app.post('/api/registerFabLab', registerFabLab);
-app.post('/api/registerService', registerService);
-app.post('/api/submitJob', submitJob);
+app.post('/fablabs', postFabLab);
+app.post('/fablabs/services', postService);
+app.post('/fablabs/jobs', postJob);
+app.get('/fablabs', getFabLabs);
+app.get('/fablabs/:fablabId', getFabLabs);
+app.delete('/fablabs/:fablabId', deleteJob);
 
 // redirect all others to the index (HTML5 history)
 app.get('*', routes.index);
