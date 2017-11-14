@@ -36,7 +36,7 @@ function postFabLab (req, res) {
         if (fablab.id){
             fablabObj._id = require('mongodb').ObjectID(fablab.id);
         }
-        req.db.collection('fablabs').save(fablabObj, function(err, docs) {
+        req.db.collection('fablabs').save(fablabObj, {"upsert":true}, function(err, docs) {
                 if (err){
                     res.status(500);
                     res.json(err);
