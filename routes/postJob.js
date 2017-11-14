@@ -7,7 +7,7 @@ function postJob (req, res) {
 	if (checkFields(job)){
 	var form = new multiparty.Form();
     form.parse(req, function(err, fields, files) {
-      if (files.file){
+      if (files && files.file){
         job.file = files.file[0].path;
         checkConsulServers(job.machine, job.material, function (err, availableServers){
             if (err){
@@ -37,6 +37,9 @@ function postJob (req, res) {
                 });
     	    }
     	})
+      }else{
+        res.status(400);
+        res.json({'err': 'Missing attachment'});
       }
     });
     }else{
@@ -86,6 +89,7 @@ function checkConsulServers(service, tag, callback){
 function getNearestFabLab(db, job, serversUp, callback){
     db.collection('fablabs').findOne({
         "_id": {$in: serversUp},
+        "equipment": { $elemMatch :{type: job.machine, status: {$nin: ["busy"]}}},
     	"location":
             { $near :
                 {

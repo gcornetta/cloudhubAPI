@@ -42,8 +42,15 @@ function getFablabInfo(fablab, callback){
                 var fablabObj = fablabWrapper.fablab;
                 fablabObj.jobs = fablabWrapper.jobs;
                 fablabObj._id = require('mongodb').ObjectID(fablabObj.id);
-                fablabObj.port = fablabObj.port || 80;
+                fablabObj.api = fablab.api;
+                fablabObj.port = fablab.port || fablabObj.port || 80;
                 delete fablabObj.id;
+                fablabObj.location = {
+                                    'type': "Point",
+                                    'coordinates': [fablabObj.coordinates.longitude, fablabObj.coordinates.latitude]
+                                }
+                delete fablabObj.coordinates.longitude;
+                delete fablabObj.coordinates.latitude;
                 for (machine in fablabObj.equipment){
                     fablabObj.jobs.details.push({
                         'machineId': fablabObj.equipment[machine].id,
@@ -115,7 +122,14 @@ var fablabObj = fablabWrapper.fablab;
                 fablabObj.jobs = fablabWrapper.jobs;
                 fablabObj._id = require('mongodb').ObjectID(fablabObj.id);
                 delete fablabObj.id;
-                fablabObj.port = fablabObj.port || 80;
+                fablabObj.api = fablab.api;
+                fablabObj.port = fablab.port || fablabObj.port || 80;
+                fablabObj.location = {
+                    'type': "Point",
+                    'coordinates': [fablabObj.coordinates.longitude, fablabObj.coordinates.latitude]
+                }
+                delete fablabObj.coordinates.longitude;
+                delete fablabObj.coordinates.latitude;
 for (machine in fablabObj.equipment){
                     fablabObj.jobs.details.push({
                         'machineId': fablabObj.equipment[machine].id,
