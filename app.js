@@ -18,6 +18,7 @@ var express = require('express'),
   routes = require('./routes'),
   api = require('./routes/api'),
   postFabLab = require('./routes/postFabLab').postFabLab;
+  connectFabLab = require('./routes/connectFabLab').connectFabLab;
   postService = require('./routes/postService').postService;
   postJob = require('./routes/postJob').postJob;
   deleteJob = require('./routes/deleteJob').deleteJob;
@@ -78,6 +79,7 @@ app.get('/partials/:name', routes.partials);
 // JSON API
 app.get('/api/name', api.name);
 app.post('/fablabs', postFabLab);
+app.post('/fablabs/connect', connectFabLab);
 app.post('/fablabs/services', postService);
 app.post('/fablabs/jobs', postJob);
 app.get('/fablabs', getFabLabs);
