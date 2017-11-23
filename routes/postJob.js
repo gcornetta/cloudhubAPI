@@ -109,7 +109,7 @@ function sendJob(db, job, fablab, callback){
                 //TODO: Pigateway must return jobID and machineID
                 //TEST
                 if (!job.machineId){
-                    job.machineId = 'exampleMachine',
+                    job.machineId = '1a234bc',
                     job.id = Math.round(Math.random()*100000)+"a";
                 }
 
@@ -125,8 +125,6 @@ function checkFields (job){
     if (
         job
         && "machine" in job
-        && "process" in job
-        && "material" in job
         && "lat" in job
         && "long" in job
     ){

@@ -11,8 +11,8 @@ var express = require('express'),
   morgan = require('morgan'),
   http = require('http'),
   path = require('path'),
-  MongoClient = require('mongodb').MongoClient,
-  assert = require('assert'),
+  mongoUtil = require('./resources/db'),
+  wsServer,
 
   //ROUTES
   routes = require('./routes'),
@@ -25,16 +25,16 @@ var express = require('express'),
   getFabLabs = require('./routes/getFabLabs').getFabLabs;
 
 var app = module.exports = express();
-
 var globalDB;
 
-// Connection URL
-var url = process.env.MONGO_URL;
-// Use connect method to connect to the server
-MongoClient.connect(url, function(err, db) {
-  assert.equal(null, err);
-  globalDB = db;
-});
+mongoUtil.connectToServer(function(err, db){
+    if (!err){
+        globalDB = db;
+        wsServer = require('./resources/wsServer');
+    }else{
+        console.error("\x1b[31m", err);
+    }
+})
 
 /**
  * Configuration
