@@ -14,27 +14,63 @@ jwks = { keys:
                   kid: 'MjBERjRDMzY0Qjc2NzlCMjUzMDc2NEZCMkRFRTM5NUE2MkQ1MkJCNQ',
                   x5t: 'MjBERjRDMzY0Qjc2NzlCMjUzMDc2NEZCMkRFRTM5NUE2MkQ1MkJCNQ' } ] };
 
-//TODO: Invalid token
-//TODO: URL metadata in env
+//TODO: Invalid token checks and fail catch
+//TODO: URL metadata in en
 module.exports.checkTokenPermissions = function(token, permission, callback){
-    if (!jwks){
-        getJWKS(function(err, jwksRet){
-            jwks = jwksRet;
-            if (jws.verify(token, jwks.keys[0], {algorithms: 'RS256'})) {
-                var decoded = jwt.decode(token);
-                if (decoded['https://testnewton.eu.com/app_metadata'][permission]){
-                    callback(true, decoded);
-                }else{
-                    callback(false);
-                }
-            }else{
-                callback(false);
-            }
-        })
+    token = validToken(token);
+    var decoded = jwt.decode(token);
+    if (tokenExpired(decoded)){
+        callback(false);
     }else{
+        if (!jwks){
+            getJWKS(function(err, jwksRet){
+                jwks = jwksRet;
+                if (jws.verify(token, jwks.keys[0], {algorithms: 'RS256'})) {
+                    if (decoded['https://testnewton.eu.com/app_metadata'][permission]){
+                        callback(true, decoded);
+                    }else{
+                        callback(false);
+                    }
+                }else{
+                    callback(false);
+                }
+            })
+        }else{
+                if (jws.verify(token, jwks.keys[0], {algorithms: 'RS256'})) {
+                    if (decoded['https://testnewton.eu.com/app_metadata'][permission]){
+                        callback(true, decoded);
+                    }else{
+                        callback(false);
+                    }
+                }else{
+                    callback(false);
+                }
+        }
+    }
+}
+
+module.exports.checkTokenUser = function(token, userId, callback){
+    token = validToken(token);
+    var decoded = jwt.decode(token);
+    if (tokenExpired(decoded)){
+        callback(false);
+    }else{
+        if (!jwks){
+            getJWKS(function(err, jwksRet){
+                jwks = jwksRet;
+                if (jws.verify(token, jwks.keys[0], {algorithms: 'RS256'})) {
+                    if ((decoded)&&(decoded.sub === userId)){
+                        callback(true, decoded);
+                    }else{
+                        callback(false);
+                    }
+                }else{
+                    callback(false);
+                }
+            })
+        }else{
             if (jws.verify(token, jwks.keys[0], {algorithms: 'RS256'})) {
-                var decoded = jwt.decode(token);
-                if (decoded['https://testnewton.eu.com/app_metadata'].fablab){
+                if ((decoded)&&(decoded.sub === userId)){
                     callback(true, decoded);
                 }else{
                     callback(false);
@@ -42,9 +78,33 @@ module.exports.checkTokenPermissions = function(token, permission, callback){
             }else{
                 callback(false);
             }
+        }
     }
+}
 
+module.exports.getUserId = function(token){
+    token = validToken(token);
+    var decoded = jwt.decode(token);
+    if (decoded) {
+        return decoded.sub;
+    }else{
+        return null;
+    }
+}
 
+function validToken(token){
+    if (token.indexOf("Bearer")!== -1){
+        token = token.slice(token.indexOf("Bearer")+7);
+    }
+    return token;
+}
+
+function tokenExpired(decodedToken){
+    if ((Math.round(Date.now()/1000)) > decodedToken.exp){
+        return true;
+    }else{
+        return false;
+    }
 }
 
 function getJWKS(callback){

@@ -15,12 +15,11 @@ var express = require('express'),
   wsServer,
 
   //ROUTES
-  routes = require('./routes'),
-  api = require('./routes/api'),
   postFabLab = require('./routes/postFabLab').postFabLab;
   connectFabLab = require('./routes/connectFabLab').connectFabLab;
   postService = require('./routes/postService').postService;
   postJob = require('./routes/postJob').postJob;
+  getJob = require('./routes/getJob').getJob;
   deleteJob = require('./routes/deleteJob').deleteJob;
   getFabLabs = require('./routes/getFabLabs').getFabLabs;
 
@@ -42,15 +41,13 @@ mongoUtil.connectToServer(function(err, db){
 app.use(function (req, res, next) {
    res.header('Access-Control-Allow-Origin', '*');
    res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,PATCH,OPTIONS');
-   res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
+   res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization, Authentication');
    req.db = globalDB;
    next();
 });
 
 // all environments
 app.set('port', process.env.PORT || 3000);
-app.set('views', __dirname + '/views');
-app.set('view engine', 'jade');
 app.use(morgan('dev'));
 app.use(bodyParser());
 app.use(methodOverride());
@@ -72,23 +69,15 @@ if (env === 'production') {
 /**
  * Routes
  */
-
-// serve index and view partials
-app.get('/', routes.index);
-app.get('/partials/:name', routes.partials);
-// JSON API
-app.get('/api/name', api.name);
+app.get('/', function(req, res){res.json({})})
 app.post('/fablabs', postFabLab);
 app.post('/fablabs/connect', connectFabLab);
 app.post('/fablabs/services', postService);
 app.post('/fablabs/jobs', postJob);
+app.get('/fablabs/jobs', getJob);
 app.get('/fablabs', getFabLabs);
 app.get('/fablabs/:fablabId', getFabLabs);
 app.delete('/fablabs/:fablabId', deleteJob);
-
-// redirect all others to the index (HTML5 history)
-app.get('*', routes.index);
-
 
 /**
  * Start Server

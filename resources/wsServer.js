@@ -5,7 +5,7 @@ const registerConsulServices = require('../routes/connectFabLab').registerServic
 
 var db = mongoUtil.getDB();
 
-const wss = new WebSocket.Server({ port: 8080 });
+const wss = new WebSocket.Server({ port: 3333 });
 
 wss.on('connection', function connection(ws) {
 

@@ -1,0 +1,3 @@
+Index must be added in order to do geospatial searches:
+
+- db.fablabs.createIndex( { location : "2dsphere" } )

@@ -4,9 +4,6 @@ function deleteJob (req, res) {
 	var jobId = req.query.job;
 	var fablabId = req.params.fablabId;
 
-	console.log(req.query)
-	console.log(req.params)
-
     if (jobId && fablabId){
 	    req.db.collection('fablabs').findOne({"_id": require('mongodb').ObjectID(fablabId)}, function (err, doc){
 	        if (err){
@@ -37,11 +34,17 @@ function cancelJob(db, jobId, fablab, callback){
         if (err){
             callback (err);
         }else{*/
-            db.collection('fablabs').updateOne(
-                {"_id": require('mongodb').ObjectID(fablab._id),
-                "jobs.details": {$elemMatch: {"jobs": {$elemMatch: {"id": jobId}}}}},
-            	{ $pull: { "jobs.details.$.jobs": {"id": jobId} }, $inc : {"jobs.queued": -1}}
-            , callback);
+        db.collection('jobs').updateOne({"id": jobId}, {$set: {"status": "cancelled"}}, function (err, doc){
+            if (err){
+                callback(err);
+            }else{
+                db.collection('fablabs').updateOne(
+                    {"_id": require('mongodb').ObjectID(fablab._id),
+                    "jobs.details": {$elemMatch: {"jobs": {$elemMatch: {"id": jobId}}}}},
+                	{ $pull: { "jobs.details.$.jobs": {"id": jobId} }, $inc : {"jobs.queued": -1}}
+                , callback);
+            }
+        });
         /*}
     });*/
 }

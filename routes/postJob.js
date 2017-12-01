@@ -1,6 +1,7 @@
 var request = require('request');
 var multiparty = require('multiparty');
 var fs = require('fs');
+var getUserId = require('../helpers/permissions').getUserId;
 
 function postJob (req, res) {
 	var job = req.query;
@@ -9,7 +10,17 @@ function postJob (req, res) {
     form.parse(req, function(err, fields, files) {
       if (files && files.file){
         job.file = files.file[0].path;
-        checkConsulServers(job.machine, job.material, function (err, availableServers){
+        var format;
+        if (job.machine = "3D printer"){
+            format = ".gcode";
+        }else{
+            format = ".png";
+        }
+        if (!job.file.endsWith(format)) {
+            res.status(400);
+            res.json({'err': 'Unsupported file format'})
+        } else {
+          checkConsulServers(job.machine, job.material, function (err, availableServers){
             if (err){
                 res.status(500);
                 res.json(err);
@@ -21,12 +32,14 @@ function postJob (req, res) {
                     }else{
                         if (doc){
                             //TODO: Send job to pigateway and wait response
+                            job.userId = getUserId(req.get("Authentication"));
+                            job.fablabId = doc._id;
                             sendJob(req.db, job, doc, function (err, result){
                                 if (err){
                                     res.status(500);
                                     res.json(err);
                                 }else{
-                                    res.json(doc);
+                                    res.json(job);
                                 }
                             })
                         }else{
@@ -36,7 +49,8 @@ function postJob (req, res) {
                     }
                 });
     	    }
-    	})
+    	  })
+    	}
       }else{
         res.status(400);
         res.json({'err': 'Missing attachment'});
@@ -102,6 +116,8 @@ function getNearestFabLab(db, job, serversUp, callback){
 function sendJob(db, job, fablab, callback){
     /*var formData = {file: fs.createReadStream(job.file)};
     delete job.file;
+    delete job.lat;
+    delete job.long;
     var req = request.post({url: 'http://'+fablab.api +':'+ fablab.port +'/fablabs/jobs', qs: job, formData: formData}, function(err, res, body) {
             if (err){
                 callback (err);
@@ -111,12 +127,18 @@ function sendJob(db, job, fablab, callback){
                 if (!job.machineId){
                     job.machineId = '1a234bc',
                     job.id = Math.round(Math.random()*100000)+"a";
+                    job.status = "queued";
                 }
-
-                db.collection('fablabs').updateOne(
-                    {"_id": fablab._id, "jobs.details.machineId": job.machineId},
-                 	{ $push: { "jobs.details.$.jobs": job }, $inc : {"jobs.queued": 1} }
-                , callback);
+                db.collection('jobs').insert(job, function(err, doc){
+                    if (err){
+                        callback(err);
+                    }else{
+                        db.collection('fablabs').updateOne(
+                            {"_id": fablab._id, "jobs.details.machineId": job.machineId},
+                            { $push: { "jobs.details.$.jobs": job }, $inc : {"jobs.queued": 1} },
+                            callback);
+                    }
+                });
             /*}
         });*/
 }
