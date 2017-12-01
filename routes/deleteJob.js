@@ -12,13 +12,16 @@ function deleteJob (req, res) {
 	        }else{
     	        if (doc){
 	                cancelJob(req.db, jobId, doc, function (err, result){
-                        console.log(err)
-                	    console.log(result)
-                	    res.json(result);
-                    })
+	                    if (err){
+	                        res.status(400);
+                            res.json(err);
+	                    }else{
+                	        res.json(result);
+                	    }
+                    });
                 }else{
                     res.status(400);
-                    res.json({'err': 'Fablab not found'});
+                    res.json({'err': 'Job not found'});
                 }
 	        }
 	    });
@@ -34,7 +37,7 @@ function cancelJob(db, jobId, fablab, callback){
         if (err){
             callback (err);
         }else{*/
-        db.collection('jobs').updateOne({"id": jobId}, {$set: {"status": "cancelled"}}, function (err, doc){
+        db.collection('jobs').removeOne({"id": jobId}, function (err, doc){
             if (err){
                 callback(err);
             }else{
