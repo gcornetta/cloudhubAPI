@@ -1,3 +1,25 @@
-Index must be added in order to do geospatial searches:
+CloudhubAPI
 
-- db.fablabs.createIndex( { location : "2dsphere" } )
+- MongoDB
+- Añadir indice para busquedas geoespaciales: db.fablabs.createIndex({location: ‘2dsphere’})
+
+
+- Auth0
+- Crear un cliente con la siguiente configuracion
+- Callback URL en Allowed Callback URLs
+- Añadir path base mas asterisco en  Allowed Origins (CORS)
+- Permitir password grant en Advanced settings > grant types
+- Crear una api y autorizar los clientes
+- Crear una regla para añadir los roles en el usuario (la url no puede contener “auth0”)
+- Añadir rol fablab en user > app_metadata en el caso que sea necesario
+
+- AWS
+- Todos los pasos en este tuto: https://auth0.com/docs/integrations/aws-api-gateway/custom-authorizers/part-1
+- Crear api en Auth0
+- Crear api en apiGateway
+- Crear un autorizador personalizado
+- Crear un rol IAM con permisos para lambda
+- Crear una funcion lambda con el autorizador
+- Seleccionar la funcion lambda como autorizador en apiGateway
+
+
