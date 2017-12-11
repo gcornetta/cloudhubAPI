@@ -22,6 +22,7 @@ var express = require('express'),
   getJob = require('./routes/getJob').getJob;
   deleteJob = require('./routes/deleteJob').deleteJob;
   getFabLabs = require('./routes/getFabLabs').getFabLabs;
+  getJobsQuery = require('./routes/getJobsQuery').getJobsQuery;
 
 var app = module.exports = express();
 var globalDB;
@@ -77,6 +78,7 @@ app.post('/fablabs/jobs', postJob);
 app.get('/fablabs/jobs', getJob);
 app.get('/fablabs', getFabLabs);
 app.get('/fablabs/:fablabId', getFabLabs);
+app.get('/fablabs/:fablabId/jobs', getJobsQuery);
 app.delete('/fablabs/:fablabId', deleteJob);
 
 /**

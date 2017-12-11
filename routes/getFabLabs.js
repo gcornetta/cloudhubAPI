@@ -2,6 +2,7 @@ var request = require('request');
 
 function getFabLabs (req, res) {
 	var query = {};
+	var fields = {};
 	var options = {
 	    limit : 10,
 	    skip : 0
@@ -15,8 +16,46 @@ function getFabLabs (req, res) {
 	if (req.query.offset){
         options.skip = parseInt(req.query.offset)
 	}
+	if (req.query.fields){
+	    var fieldsArray = req.query.fields.split(',');
+	    for (var i=0; i<fieldsArray.length; i++){
+	        fields[fieldsArray[i]]=true;
+	    }
+	}if (req.query.q){
+	    var queryArray = req.query.q.split(',');
+	    if (queryArray.length > 0){
+	        query.equipment = {$elemMatch:{}};
+	        for (var i=0; i<queryArray.length; i++){
+    	        switch (queryArray[i]){
+	                case "Laser cutter":
+	                case "laser cutter":
+	                case "Vinyl cutter":
+	                case "vinyl cutter":
+	                case "Milling machine":
+	                case "milling machine":
+    	            case "3D printer":
+    	            case "3D Printer":
+    	            case "3d Printer":
+    	            case "3d printer":
+    	                query.equipment.$elemMatch.type = queryArray[i];
+	                    break;
+	                case "Epilog":
+	                case "epilog":
+    	            case "GCC":
+	                case "Trotec":
+	                case "trotec":
+	                case "Roland":
+	                case "roland":
+	                case "Prusa":
+	                case "prusa":
+    	                query.equipment.$elemMatch.vendor = queryArray[i];
+    	                break;
+	            }
+	        }
+	    }
+	}
 
-    req.db.collection('fablabs').find(query, options).toArray(function(err, docs) {
+    req.db.collection('fablabs').find(query, options).project(fields).toArray(function(err, docs) {
         if (err){
             res.status(500);
             res.json(err);
