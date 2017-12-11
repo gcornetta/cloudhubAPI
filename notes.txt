@@ -9,6 +9,7 @@ CloudhubAPI
 - Callback URL en Allowed Callback URLs
 - Añadir path base mas asterisco en  Allowed Origins (CORS)
 - Permitir password grant en Advanced settings > grant types
+- Permitir client credentials grant en Advanced settings > grant types del cliente api
 - Crear una api y autorizar los clientes
 - Crear una regla para añadir los roles en el usuario (la url no puede contener “auth0”)
 - Añadir rol fablab en user > app_metadata en el caso que sea necesario
