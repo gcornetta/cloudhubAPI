@@ -73,26 +73,30 @@ function getFablabInfo(fablab, callback){
             if (body){
                 var fablabWrapper = JSON.parse(body);
                 var fablabObj = fablabWrapper.fablab;
-                fablabObj.jobs = fablabWrapper.jobs;
-                fablabObj._id = require('mongodb').ObjectID(fablab._id);
-                fablabObj.api = fablab.api;
-                fablabObj.port = fablab.port;
-                fablabObj.location = {
-                                    'type': "Point",
-                                    'coordinates': [parseFloat(fablabObj.coordinates.longitude), parseFloat(fablabObj.coordinates.latitude)]
-                                }
-                delete fablabObj.coordinates.longitude;
-                delete fablabObj.coordinates.latitude;
-                delete fablabObj.coordinates;
-                for (machine in fablabObj.equipment){
-                    fablabObj.jobs.details.push({
-                        'machineId': fablabObj.equipment[machine].id,
-                        'type': fablabObj.equipment[machine].type,
-                        'vendor': fablabObj.equipment[machine].vendor,
-                        'jobs': []
-                    })
+                if (fablabObj.coordinates){
+                    fablabObj.jobs = fablabWrapper.jobs;
+                    fablabObj._id = require('mongodb').ObjectID(fablab._id);
+                    fablabObj.api = fablab.api;
+                    fablabObj.port = fablab.port;
+                    fablabObj.location = {
+                                        'type': "Point",
+                                        'coordinates': [parseFloat(fablabObj.coordinates.longitude), parseFloat(fablabObj.coordinates.latitude)]
+                                    }
+                    delete fablabObj.coordinates.longitude;
+                    delete fablabObj.coordinates.latitude;
+                    delete fablabObj.coordinates;
+                    for (machine in fablabObj.equipment){
+                        fablabObj.jobs.details.push({
+                            'machineId': fablabObj.equipment[machine].id,
+                            'type': fablabObj.equipment[machine].type,
+                            'vendor': fablabObj.equipment[machine].vendor,
+                            'jobs': []
+                        })
+                    }
+                    callback(null, fablabObj);
+                }else{
+                    callback({"message": "Incomplete fablab"});
                 }
-                callback(null, fablabObj);
             }else{
                 callback({"message": "fablab not found"});
             }
