@@ -3,7 +3,6 @@ var jwt = require('jsonwebtoken');
 var request = require('request');
 
 var jwks;
-console.log("test")
 //TEST
 /*jwks = { keys:
               [ { alg: 'RS256',
