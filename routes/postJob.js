@@ -11,7 +11,7 @@ function postJob (req, res) {
       if (files && files.file){
         job.file = files.file[0].path;
         var format;
-        if (job.machine = "3D printer"){
+        if (job.machine === "3D printer"){
             format = ".gcode";
         }else{
             format = ".png";
@@ -30,18 +30,23 @@ function postJob (req, res) {
                         res.status(500);
                         res.json(err);
                     }else{
-                        if (doc){
+                        if (doc[0]){
                             //TODO: Send job to pigateway and wait response
-                            job.userId = getUserId(req.get("Authentication"));
-                            job.fablabId = doc._id;
-                            sendJob(req.db, job, doc, function (err, result){
-                                if (err){
-                                    res.status(500);
-                                    res.json(err);
-                                }else{
-                                    res.json(job);
-                                }
-                            })
+                            if (req.get("Authentication")){
+                                job.userId = getUserId(req.get("Authentication"));
+                                job.fablabId = doc[0]._id;
+                                sendJob(req.db, job, doc, 0, function (err, result){
+                                    if (err){
+                                        res.status(500);
+                                        res.json(err);
+                                    }else{
+                                        res.json(job);
+                                    }
+                                })
+                            }else{
+                                res.status(403);
+                                res.json({'err': 'Unauthorized'});
+                            }
                         }else{
                             res.status(400);
                             res.json({'err': 'No fablabs available'})
@@ -101,7 +106,7 @@ function checkConsulServers(service, tag, callback){
 }
 
 function getNearestFabLab(db, job, serversUp, callback){
-    db.collection('fablabs').findOne({
+    db.collection('fablabs').find({
         "_id": {$in: serversUp},
         "equipment": { $elemMatch :{type: job.machine, status: {$nin: ["busy"]}}},
     	"location":
@@ -110,18 +115,23 @@ function getNearestFabLab(db, job, serversUp, callback){
                     $geometry: { type: "Point",  coordinates: [ parseFloat(job.long), parseFloat(job.lat) ] }
                 }
             }
-    }, callback);
+    }).toArray(callback);
 }
 
-function sendJob(db, job, fablab, callback){
-    /*var formData = {file: fs.createReadStream(job.file)};
-    delete job.file;
-    delete job.lat;
-    delete job.long;
-    var req = request.post({url: 'http://'+fablab.api +':'+ fablab.port +'/fablabs/jobs', qs: job, formData: formData}, function(err, res, body) {
+function sendJob(db, job, fablabs, fablabIndex, callback){
+    var fablab = fablabs[fablabIndex];
+    var formData = {file: fs.createReadStream(job.file)};
+    var queryString = JSON.parse(JSON.stringify(job));
+    queryString.user = queryString.userId;
+    queryString.process = "cut" //TODO: Delete
+    delete queryString.userId;
+    delete queryString.file;
+    delete queryString.lat;
+    delete queryString.long;
+    var req = request.post({url: 'http://'+fablab.api +':'+ fablab.port +'/fablab/jobs', qs: queryString, formData: formData}, function(err, res, body) {
             if (err){
                 callback (err);
-            }else{*/
+            }else if (!JSON.parse(body).code){
                 //TODO: Pigateway must return jobID and machineID
                 //TEST
                 if (!job.machineId){
@@ -139,8 +149,26 @@ function sendJob(db, job, fablab, callback){
                             callback);
                     }
                 });
-            /*}
-        });*/
+            }else{
+                switch (JSON.parse(body).code){
+                    case 7: //Fablab busy. Try next fablab
+                        if (fablabs[fablabIndex+1]){
+                            sendJob(db, job, fablabs, fablabIndex+1, callback);
+                        }else{
+                            callback({'err': 'No fablabs available'})
+                        }
+                    break;
+                    case 3: //Fablab object not built yet. Try again after 1 second
+                        setTimeout(function(){
+                            sendJob(db, job, fablabs, fablabIndex, callback);
+                        }, 1000);
+                    break;
+                    default:
+                        callback(JSON.parse(body));
+                    break;
+                }
+            }
+        });
 }
 
 function checkFields (job){

@@ -19,6 +19,7 @@ wss.on('connection', function connection(ws) {
         }else{
             switch (msg.event){
                 case "serviceUp": //(fablabId, machineId)
+                    console.log("serviceUp");
                     var auxMaterials = [];
                     for (var mat in fablab.materials){
                         auxMaterials.push(fablab.materials[mat].type);
@@ -27,17 +28,21 @@ wss.on('connection', function connection(ws) {
                         if (err){
                             ws.send(JSON.stringify(err));
                         }else{
+
+                            console.log("serviceUpFinished");
                            ws.send(JSON.stringify({msg: "Service added successfully"}));
                         }
                     });
                 break;
                 case "serviceDown": //(fablabId, machineId)
+                    console.log("serviceDown");
                     for (var machine in fablab.equipment){
                         if (fablab.equipment[machine].id == msg.machineId){
                             deregisterServices(fablab, [fablab.equipment[machine]], function(err){
                                 if (err){
                                     ws.send(JSON.stringify(err));
                                 }else{
+                    console.log("serviceDownFinished");
                                     ws.send(JSON.stringify({msg: "Service deleted successfully"}));
                                 }
                             });
@@ -45,16 +50,19 @@ wss.on('connection', function connection(ws) {
                         }
                     }
                 break;
-                case "fablabDown": //(fablabId)
+                case "fabLabDown": //(fablabId)
+                    console.log("fablabDown");
                     deregisterServices(fablab, fablab.equipment, function(err){
                         if (err){
                             ws.send(JSON.stringify(err));
                         }else{
+                    console.log("fablabDownF");
                            ws.send(JSON.stringify({msg: "Services deleted successfully"}));
                         }
                     });
                 break;
-                case "stateChange": //(fablabId, machineId, status)
+                case "machineStateChange": //(fablabId, machineId, status)
+                    console.log("machineStateChange");
                     for (var machine in fablab.equipment){
                         if (fablab.equipment[machine].id == msg.machineId){
                             fablab.equipment[machine].status = msg.status;
@@ -65,6 +73,7 @@ wss.on('connection', function connection(ws) {
                         if (err){
                             ws.send(JSON.stringify(err));
                         }else{
+                    console.log("machineStateChangeF");
                            ws.send(JSON.stringify({msg: "Status updated"}));
                         }
                     });

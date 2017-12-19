@@ -36,7 +36,7 @@ function cancelJob(db, jobId, fablab, callback){
     /*var req = request.delete({url:'http://'+fablab.api +':'+ fablab.port +'/fablabs/'+fablab._id, qs: {job: jobId}}, function(err, res, body) {
         if (err){
             callback (err);
-        }else{*/
+        }else if (!JSON.parse(body).code){*/
         db.collection('jobs').removeOne({"id": jobId}, function (err, doc){
             if (err){
                 callback(err);
@@ -48,7 +48,13 @@ function cancelJob(db, jobId, fablab, callback){
                 , callback);
             }
         });
-        /*}
+        /*}else{
+            switch (JSON.parse(body).code){
+                default:
+                    callback(JSON.parse(body));
+                break;
+            }
+        }
     });*/
 }
 

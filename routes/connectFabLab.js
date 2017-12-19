@@ -3,10 +3,10 @@ var checkToken = require('../helpers/permissions');
 
 function connectFabLab (req, res) {
     var token = req.get("Authentication");
-	//var fablabObj = req.body;
+	var fablabObj = req.body;
     checkToken.checkTokenPermissions(token, "fablab", function(authorized, payload){
         if (authorized && payload){
-            //if (checkFields(fablabObj)){
+            if (checkFields(fablabObj)){
                 req.db.collection('fablabs').findOne({userid: payload.sub}, function(err, incompleteFablab){
                         if (err){
                             res.status(500);
@@ -18,28 +18,34 @@ function connectFabLab (req, res) {
                             /*checkToken.checkTokenUser(token, fablab.userid, function(authorized, payload){ //Check if userID in token corresponds with the fablab userID
                                 if (authorized && payload){
                             */
+                                    incompleteFablab.api = fablabObj.api;
+                                    incompleteFablab.port = fablabObj.port || 80;
                                     getFablabInfo(incompleteFablab, function(err, fablab){
-                                        var auxMaterials = [];
-                                        for (var mat in fablab.materials){
-                                            auxMaterials.push(fablab.materials[mat].type);
-                                        }
-                                        var auxMachines = JSON.parse(JSON.stringify(fablab.equipment));
-                                        registerServices(fablab, auxMachines, auxMaterials, function(err){
-                                            if (err){
-                                                res.status(500);
-                                                res.json(err);
-                                            }else{
-                                                delete fablab._id;
-                                                req.db.collection('fablabs').update({_id: require('mongodb').ObjectID(incompleteFablab._id)}, {$set:fablab}, function(err, docs) {
-                                                    if (err){
-                                                        res.status(500);
-                                                        res.json(err);
-                                                    }else{
-                                                        res.json({"result":docs.result.n});
-                                                    }
-                                                });
+                                        if (err){
+                                            res.json(err);
+                                        }else{
+                                            var auxMaterials = [];
+                                            for (var mat in fablab.materials){
+                                                auxMaterials.push(fablab.materials[mat].type);
                                             }
-                                        });
+                                            var auxMachines = JSON.parse(JSON.stringify(fablab.equipment));
+                                            registerServices(fablab, auxMachines, auxMaterials, function(err){
+                                                if (err){
+                                                    res.status(500);
+                                                    res.json(err);
+                                                }else{
+                                                    delete fablab._id;
+                                                    req.db.collection('fablabs').update({_id: require('mongodb').ObjectID(incompleteFablab._id)}, {$set:fablab}, function(err, docs) {
+                                                        if (err){
+                                                            res.status(500);
+                                                            res.json(err);
+                                                        }else{
+                                                            res.json({"result":docs.result.n});
+                                                        }
+                                                    });
+                                                }
+                                            });
+                                        }
                                     });
                         /*        }else{
                                     res.status(403);
@@ -48,10 +54,10 @@ function connectFabLab (req, res) {
                             });
                         */}
                 });
-            /*}else{
+            }else{
                 res.status(400);
                 res.json({'err': 'Incomplete fablab info'});
-            }*/
+            }
         }else{
             res.status(403);
             res.json({'err': 'Unauthorized'});
@@ -60,7 +66,7 @@ function connectFabLab (req, res) {
 }
 
 function getFablabInfo(fablab, callback){
-    /*var req = request.get({url: 'http://'+fablab.api + '/fablab/'}, function(err, res, body) {
+    var req = request.get({url: 'http://'+fablab.api+ ":" + fablab.port + '/fablab/'}, function(err, res, body) {
         if (err){
             callback (err);
         }else{
@@ -68,13 +74,12 @@ function getFablabInfo(fablab, callback){
                 var fablabWrapper = JSON.parse(body);
                 var fablabObj = fablabWrapper.fablab;
                 fablabObj.jobs = fablabWrapper.jobs;
-                fablabObj._id = require('mongodb').ObjectID(fablabObj.id);
-                fablabObj.api = fablab.api || fablabObj.api;
-                fablabObj.port = fablab.port || fablabObj.port || 80;
-                delete fablabObj.id;
+                fablabObj._id = require('mongodb').ObjectID(fablab._id);
+                fablabObj.api = fablab.api;
+                fablabObj.port = fablab.port;
                 fablabObj.location = {
                                     'type': "Point",
-                                    'coordinates': [fablabObj.coordinates.longitude, fablabObj.coordinates.latitude]
+                                    'coordinates': [parseFloat(fablabObj.coordinates.longitude), parseFloat(fablabObj.coordinates.latitude)]
                                 }
                 delete fablabObj.coordinates.longitude;
                 delete fablabObj.coordinates.latitude;
@@ -92,16 +97,15 @@ function getFablabInfo(fablab, callback){
                 callback({"message": "fablab not found"});
             }
         }
-    });*/
+    });
 
     //TEST
-let fablabWrapper = {
+/*let fablabWrapper = {
   fablab: {
     id: '5a05d341e3de134066da700d',
     name: 'FabLab@CEU',
     web: 'http://www.xxxxxx',
     api: "localhost",
-    port: 3000,
     capacity: 0,
     address: {
       street: 'Avda. de Montepríncipe S/N',
@@ -152,8 +156,8 @@ var fablabObj = fablabWrapper.fablab;
                 fablabObj.jobs = fablabWrapper.jobs;
                 fablabObj._id = require('mongodb').ObjectID(fablab._id);
                 delete fablabObj.id;
-                fablabObj.api = fablab.api || fablabObj.api;
-                fablabObj.port = fablab.port || fablabObj.port || 80;
+                fablabObj.api = fablab.api;
+                fablabObj.port = fablab.port || 80;
                 fablabObj.location = {
                     'type': "Point",
                     'coordinates': [fablabObj.coordinates.longitude, fablabObj.coordinates.latitude]
@@ -169,7 +173,7 @@ for (machine in fablabObj.equipment){
                         'jobs': []
                     })
                 }
-                callback(null, fablabObj);
+                callback(null, fablabObj);*/
 }
 
 function registerServices(fablab, machines, materials, callback){
@@ -206,7 +210,7 @@ function addConsulService(fablab, service, callback){
                 "Address": fablab.api,
                 "Port": fablab.port,
                 "check": {
-                  "http": "http://"+fablab.api+":"+fablab.port,
+                  "http": "http://"+fablab.api+":"+fablab.port /*TEST*/ + "/fablab",
                   "interval": "30s",
                   "timeout": "1s"
                  }
@@ -223,7 +227,7 @@ function checkFields (fablab){
     if (
         fablab
         //&& "id" in fablab
-        //&& "api" in fablab
+        && "api" in fablab
     ){
         return true;
     }else{

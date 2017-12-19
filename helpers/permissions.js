@@ -15,40 +15,44 @@ var jwks;
                   x5t: 'MjBERjRDMzY0Qjc2NzlCMjUzMDc2NEZCMkRFRTM5NUE2MkQ1MkJCNQ' } ] };*/
 
 module.exports.checkTokenPermissions = function(token, permission, callback){
-    token = validToken(token);
-    try {
-        var decoded = jwt.decode(token);
-    } catch (e) {
-        console.log(e);
-    }
-    if (decoded){
-        if (tokenExpired(decoded)){
-            callback(false);
-        }else{
-            if (!jwks){
-                getJWKS(function(err, jwksRet){
-                    jwks = jwksRet;
-                    if (jws.verify(token, jwks.keys[0], {algorithms: 'RS256'})) {
-                        if (decoded[process.env.METADATA_URL][permission]){
-                            callback(true, decoded);
-                        }else{
-                            callback(false);
-                        }
-                    }else{
-                        callback(false);
-                    }
-                })
+    if (token){
+        token = validToken(token);
+        try {
+            var decoded = jwt.decode(token);
+        } catch (e) {
+            console.log(e);
+        }
+        if (decoded){
+            if (tokenExpired(decoded)){
+                callback(false);
             }else{
-                    if (jws.verify(token, jwks.keys[0], {algorithms: 'RS256'})) {
-                        if (decoded[process.env.METADATA_URL][permission]){
-                            callback(true, decoded);
+                if (!jwks){
+                    getJWKS(function(err, jwksRet){
+                        jwks = jwksRet;
+                        if (jws.verify(token, jwks.keys[0], {algorithms: 'RS256'})) {
+                            if (decoded[process.env.METADATA_URL][permission]){
+                                callback(true, decoded);
+                            }else{
+                                callback(false);
+                            }
                         }else{
                             callback(false);
                         }
-                    }else{
-                        callback(false);
-                    }
+                    })
+                }else{
+                        if (jws.verify(token, jwks.keys[0], {algorithms: 'RS256'})) {
+                            if (decoded[process.env.METADATA_URL][permission]){
+                                callback(true, decoded);
+                            }else{
+                                callback(false);
+                            }
+                        }else{
+                            callback(false);
+                        }
+                }
             }
+        }else{
+            callback(false);
         }
     }else{
         callback(false);
@@ -56,19 +60,31 @@ module.exports.checkTokenPermissions = function(token, permission, callback){
 }
 
 module.exports.checkTokenUser = function(token, userId, callback){
-    token = validToken(token);
-    try {
-        var decoded = jwt.decode(token);
-    } catch (e) {
-        console.log(e);
-    }
-    if (decoded){
-       if (tokenExpired(decoded)){
-            callback(false);
-        }else{
-            if (!jwks){
-                getJWKS(function(err, jwksRet){
-                    jwks = jwksRet;
+    if (token){
+        token = validToken(token);
+        try {
+            var decoded = jwt.decode(token);
+        } catch (e) {
+            console.log(e);
+        }
+        if (decoded){
+           if (tokenExpired(decoded)){
+                callback(false);
+            }else{
+                if (!jwks){
+                    getJWKS(function(err, jwksRet){
+                        jwks = jwksRet;
+                        if (jws.verify(token, jwks.keys[0], {algorithms: 'RS256'})) {
+                            if ((decoded)&&(decoded.sub === userId)){
+                                callback(true, decoded);
+                            }else{
+                                callback(false);
+                            }
+                        }else{
+                            callback(false);
+                        }
+                    })
+                }else{
                     if (jws.verify(token, jwks.keys[0], {algorithms: 'RS256'})) {
                         if ((decoded)&&(decoded.sub === userId)){
                             callback(true, decoded);
@@ -78,18 +94,10 @@ module.exports.checkTokenUser = function(token, userId, callback){
                     }else{
                         callback(false);
                     }
-                })
-            }else{
-                if (jws.verify(token, jwks.keys[0], {algorithms: 'RS256'})) {
-                    if ((decoded)&&(decoded.sub === userId)){
-                        callback(true, decoded);
-                    }else{
-                        callback(false);
-                    }
-                }else{
-                    callback(false);
                 }
             }
+        }else{
+            callback(false);
         }
     }else{
         callback(false);
