@@ -75,7 +75,7 @@ function checkConsulServers(service, tag, callback){
     }else{
         tag = "?tag="+tag.toLowerCase()
     }
-    request.post(process.env.CONSUL_ADDR +'/v1/catalog/service/'+service.toLowerCase()+tag, function(err, res, body) {
+    request.get(process.env.CONSUL_ADDR +'/v1/catalog/service/'+service.toLowerCase()+tag, function(err, res, body) {
         if (err){
             callback (err, resultArray);
         }else{
@@ -83,7 +83,7 @@ function checkConsulServers(service, tag, callback){
                 body = '{}';
             }
             var services = JSON.parse(body);
-            request.post(process.env.CONSUL_ADDR +'/v1/health/state/critical', function(err, res, body) {
+            request.get(process.env.CONSUL_ADDR +'/v1/health/state/critical', function(err, res, body) {
                 if (!body){
                     body = '{}';
                 }
@@ -132,13 +132,9 @@ function sendJob(db, job, fablabs, fablabIndex, callback){
             if (err){
                 callback (err);
             }else if (!JSON.parse(body).code){
-                //TODO: Pigateway must return jobID and machineID
-                //TEST
-                if (!job.machineId){
-                    job.machineId = '1a234bc',
-                    job.id = Math.round(Math.random()*100000)+"a";
-                    job.status = "queued";
-                }
+                job.id = JSON.parse(body).jobId;
+                job.machineId = JSON.parse(body).mId;
+                job.status = "queued";
                 db.collection('jobs').insert(job, function(err, doc){
                     if (err){
                         callback(err);

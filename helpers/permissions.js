@@ -28,15 +28,19 @@ module.exports.checkTokenPermissions = function(token, permission, callback){
             }else{
                 if (!jwks){
                     getJWKS(function(err, jwksRet){
-                        jwks = jwksRet;
-                        if (jws.verify(token, jwks.keys[0], {algorithms: 'RS256'})) {
-                            if (decoded[process.env.METADATA_URL][permission]){
-                                callback(true, decoded);
+                        if (err){
+                            callback(false);
+                        }else{
+                            jwks = jwksRet;
+                            if (jws.verify(token, jwks.keys[0], {algorithms: 'RS256'})) {
+                                if (decoded[process.env.METADATA_URL][permission]){
+                                    callback(true, decoded);
+                                }else{
+                                    callback(false);
+                                }
                             }else{
                                 callback(false);
                             }
-                        }else{
-                            callback(false);
                         }
                     })
                 }else{
@@ -73,15 +77,19 @@ module.exports.checkTokenUser = function(token, userId, callback){
             }else{
                 if (!jwks){
                     getJWKS(function(err, jwksRet){
-                        jwks = jwksRet;
-                        if (jws.verify(token, jwks.keys[0], {algorithms: 'RS256'})) {
-                            if ((decoded)&&(decoded.sub === userId)){
-                                callback(true, decoded);
+                        if (err){
+                            callback(false);
+                        }else{
+                            jwks = jwksRet;
+                            if (jws.verify(token, jwks.keys[0], {algorithms: 'RS256'})) {
+                                if ((decoded)&&(decoded.sub === userId)){
+                                    callback(true, decoded);
+                                }else{
+                                    callback(false);
+                                }
                             }else{
                                 callback(false);
                             }
-                        }else{
-                            callback(false);
                         }
                     })
                 }else{
@@ -131,8 +139,11 @@ function tokenExpired(decodedToken){
 
 function getJWKS(callback){
     request.get({method: 'GET', uri: "https://"+process.env.AUTH0_DOMAIN +'/.well-known/jwks.json'}, function(err, res, body) {
+        if  (err) {
+            console.log(err);
+        }
         if (!body){
-            body = {};
+            body = '{}';
         }
         callback (err, JSON.parse(body));
     });

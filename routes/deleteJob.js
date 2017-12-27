@@ -33,29 +33,29 @@ function deleteJob (req, res) {
 
 //TODO: check returned body
 function cancelJob(db, jobId, fablab, callback){
-    /*var req = request.delete({url:'http://'+fablab.api +':'+ fablab.port +'/fablabs/'+fablab._id, qs: {job: jobId}}, function(err, res, body) {
+    var req = request.delete({url:'http://'+fablab.api +':'+ fablab.port +'/fablab/jobs/'+jobId}, function(err, res, body) {
         if (err){
             callback (err);
-        }else if (!JSON.parse(body).code){*/
-        db.collection('jobs').removeOne({"id": jobId}, function (err, doc){
-            if (err){
-                callback(err);
-            }else{
-                db.collection('fablabs').updateOne(
-                    {"_id": require('mongodb').ObjectID(fablab._id),
-                    "jobs.details": {$elemMatch: {"jobs": {$elemMatch: {"id": jobId}}}}},
-                	{ $pull: { "jobs.details.$.jobs": {"id": jobId} }, $inc : {"jobs.queued": -1}}
-                , callback);
-            }
-        });
-        /*}else{
+        }else if (!JSON.parse(body).code){
+            db.collection('jobs').removeOne({"id": jobId}, function (err, doc){
+                if (err){
+                    callback(err);
+                }else{
+                    db.collection('fablabs').updateOne(
+                        {"_id": require('mongodb').ObjectID(fablab._id),
+                        "jobs.details": {$elemMatch: {"jobs": {$elemMatch: {"id": jobId}}}}},
+                        { $pull: { "jobs.details.$.jobs": {"id": jobId} }, $inc : {"jobs.queued": -1}}
+                    , callback);
+                }
+            });
+        }else{
             switch (JSON.parse(body).code){
                 default:
                     callback(JSON.parse(body));
                 break;
             }
         }
-    });*/
+    });
 }
 
 exports.deleteJob = deleteJob;
