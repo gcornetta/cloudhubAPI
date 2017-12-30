@@ -71,15 +71,16 @@ if (env === 'production') {
  * Routes
  */
 app.get('/', function(req, res){res.json({})})
-app.post('/fablabs', postFabLab);
+//app.post('/fablabs', postFabLab);
 app.post('/fablabs/connect', connectFabLab);
-app.post('/fablabs/services', postService);
+//app.post('/fablabs/services', postService);
 app.post('/fablabs/jobs', postJob);
 app.get('/fablabs/jobs', getJob);
 app.get('/fablabs', getFabLabs);
 app.get('/fablabs/:fablabId', getFabLabs);
 app.get('/fablabs/:fablabId/jobs', getJobsQuery);
 app.delete('/fablabs/:fablabId', deleteJob);
+app.delete('/fablabs/:fablabId/jobs', deleteJob);
 
 /**
  * Start Server

@@ -16,7 +16,7 @@ function deleteJob (req, res) {
 	                        res.status(400);
                             res.json(err);
 	                    }else{
-                	        res.json(result);
+                	        res.json({result: 'OK'});
                 	    }
                     });
                 }else{

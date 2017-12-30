@@ -1,0 +1,530 @@
+swagger: "2.0"
+
+info:
+  version: 1.0.0
+  title: Piwrapper API
+  description: Piwrapper REST API
+
+schemes:
+  - http
+host: localhost:3000
+basePath: /
+produces:
+  - application/json
+
+paths:
+  /fablabs/connect:
+    post:
+      summary: Fablabs register
+      description: >
+        Add a new fablab and services to cloudhub
+      tags:
+        - post
+      security:
+        - tokenSecurity: []
+        - tokenAuth: []
+      parameters:
+       - name: fablab
+         in: body
+         required: true
+         description: Fablab pigateway url and port
+         schema:
+            required:
+              - api
+              - port
+            properties:
+              api:
+                type: string
+              port:
+                type: string
+      responses:
+        200:
+          schema:
+            $ref: '#/definitions/fablabs'
+          description: A JSON object with the fablab object.
+        400:
+          description: Bad request.
+        403:
+          description: Unauthorized.
+        500:
+          description: Internal server error.
+  /fablabs/{fablabid}:
+    get:
+      summary: Fablabs query
+      description: >
+        Returns updated fablabs object
+      tags:
+        - get
+      security:
+        - tokenSecurity: []
+        - tokenAuth: []
+      parameters:
+        - $ref: '#/parameters/optionalfablabid'
+        - $ref: '#/parameters/limit'
+        - $ref: '#/parameters/offset'
+        - $ref: '#/parameters/fields'
+        - $ref: '#/parameters/search'
+      responses:
+        200:
+          schema:
+            $ref: '#/definitions/fablabs'
+          description: A JSON object with the fablab object.
+        400:
+          description: Bad request.
+        403:
+          description: Unauthorized.
+        500:
+          description: Internal server error.
+  /fablabs/{fablabid}/jobs:
+    get:
+      summary: Jobs query
+      description: >
+        Returns jobs
+      tags:
+        - get
+      security:
+        - tokenSecurity: []
+        - tokenAuth: []
+      parameters:
+        - $ref: '#/parameters/fablabid'
+        - $ref: '#/parameters/optionaljob'
+        - $ref: '#/parameters/limit'
+        - $ref: '#/parameters/offset'
+        - $ref: '#/parameters/fields'
+        - $ref: '#/parameters/searchJob'
+      responses:
+        200:
+          schema:
+            $ref: '#/definitions/jobsArray'
+          description: A JSON array with the jobs that match the query.
+        400:
+          description: Bad request.
+        403:
+          description: Unauthorized.
+        500:
+          description: Internal server error.
+    delete:
+      summary: Delete a job
+      description: >
+        Route to delete a job
+      tags:
+        - delete
+      security:
+        - tokenSecurity: []
+        - tokenAuth: []
+      parameters:
+        - $ref: '#/parameters/fablabid'
+        - $ref: '#/parameters/job'
+      responses:
+        200:
+          schema:
+            type: object
+            description: Result object
+            properties:
+              result:
+                type: string
+                enum:
+                  - OK
+          description: A JSON object with the job info.
+        400:
+          description: Bad request.
+        403:
+          description: Unauthorized.
+        500:
+          description: Internal server error.
+  /fablabs/jobs:
+    post:
+      summary: Upload a new job
+      description: >
+        Route to upload a new job
+      tags:
+        - post
+      security:
+        - tokenSecurity: []
+        - tokenAuth: []
+      consumes:
+        - multipart/form-data
+      parameters:
+        - $ref: '#/parameters/file'
+        - $ref: '#/parameters/machine'
+        - $ref: '#/parameters/lat'
+        - $ref: '#/parameters/long'
+        - $ref: '#/parameters/material'
+        - $ref: '#/parameters/process'
+        - $ref: '#/parameters/pcbFinishing'
+        - $ref: '#/parameters/waxFinishing'
+      responses:
+        200:
+          schema:
+            $ref: '#/definitions/job'
+          description: A JSON object with the job info.
+        400:
+          description: Bad request.
+        403:
+          description: Unauthorized.
+        500:
+          description: Internal server error.
+
+securityDefinitions:
+  tokenSecurity:
+    type: apiKey
+    in: header
+    name: Authorization
+  tokenAuth:
+    type: apiKey
+    in: header
+    name: Authentication
+
+parameters:
+  fablabid:
+      name: fablabid
+      in: path
+      required: true
+      description: The fablab identifier
+      type: string
+      default: ''
+  optionalfablabid:
+      name: fablabid
+      in: path
+      description: The fablab identifier
+      type: string
+      default: ''
+  job:
+      name: job
+      in: query
+      required: true
+      description: The jobid identifier
+      type: string
+  optionaljob:
+      name: job
+      in: query
+      required: false
+      description: The jobid identifier
+      type: string
+  limit:
+      name: limit
+      in: query
+      required: false
+      type: integer
+  offset:
+      name: offset
+      in: query
+      required: false
+      type: integer
+  fields:
+      name: fields
+      in: query
+      required: false
+      description: Fields returned by the query. Separated by comma (",")
+      type: string
+  search:
+      name: q
+      in: query
+      type: string
+      enum:
+        - Laser cutter
+        - Laser cutter,Epilog
+        - Laser cutter,GCC
+        - Vinyl cutter
+        - Vinyl cutter,Trotec
+        - Vinyl cutter,Roland
+        - Milling machine
+        - Milling machine,Roland
+        - 3D printer
+        - 3D printer,Prusa
+        - Epilog
+        - GCC
+        - Trotec
+        - Roland
+        - Prusa
+      description: >
+        Fablab search by machine type and vendor. Separated by comma (",")
+  searchJob:
+      name: q
+      in: query
+      type: string
+      enum:
+        - Laser cutter
+        - Vinyl cutter
+        - Milling machine
+        - 3D printer
+        - pending
+        - queued
+        - running
+        - paused
+        - cancelled
+      description: >
+        Job search by machine type and status. Separated by comma (",")
+  machine:
+      name: machine
+      in: query
+      required: true
+      description: Machine type
+      type: string
+      enum:
+        - Laser cutter
+        - Milling machine
+        - Vinyl cutter
+        - 3D printer
+  material:
+      name: material
+      in: query
+      description: Fabrication material
+      type: string
+      enum:
+        - vinyl
+        - epoxy
+        - copper
+        - wood
+        - mylar
+        - acrylic
+        - cardboard
+  process:
+      name: process
+      in: query
+      description: Fabrication process
+      type: string
+      enum:
+        - cut
+        - halftone
+        - wax
+  pcbFinishing:
+      name: pcbFinishing
+      in: query
+      description: Milling machine cut finishing
+      type: string
+      enum:
+        - traces_1_64
+        - outline_1_32
+        - traces_0_010
+  waxFinishing:
+      name: waxFinishing
+      in: query
+      description: Milling machine wax finishing
+      type: string
+      enum:
+        - rough_cut
+        - finish_cut
+  file:
+      name: file
+      in: formData
+      required: true
+      type: file
+      description: The file with the design submitted for fabrication. Format .gcode for 3d print and .png for the rest
+  lat:
+    name: lat
+    in: query
+    required: true
+    description: User location (latitude)
+    type: string
+  long:
+    name: long
+    in: query
+    required: true
+    description: User location (longitude)
+    type: string
+
+definitions:
+  fablabs:
+    type: object
+    description: Fablabs object
+    properties:
+      id:
+        type: string
+        format: uuid
+        description: The fablab unique identifier
+      _id:
+        type: string
+        format: uuid
+        description: The fablab unique identifier
+      email:
+        type: string
+      userid:
+        type: string
+      name:
+        type: string
+      web:
+        type: string
+      api:
+        type: string
+        description: Fablab wrapper url
+      port:
+        type: integer
+        description: Fablab wrapper port
+      capacity:
+        type: string
+      address:
+        type: object
+        properties:
+          university:
+            type: string
+          road:
+            type: string
+          city:
+            type: string
+          state:
+            type: string
+          postcode:
+            type: string
+          country:
+            type: string
+          country_code:
+            type: string
+      contact:
+        type: object
+        properties:
+          name:
+            type: string
+          charge:
+            type: string
+          email:
+            type: string
+      openingDays:
+        type: array
+        items:
+          type: object
+          properties:
+            day:
+              type: string
+            from:
+              type: string
+            to:
+              type: string
+      equipment:
+        type: array
+        items:
+          type: object
+          properties:
+            id:
+              type: string
+              format: uuid
+            url:
+              type: string
+            name:
+              type: string
+            vendor:
+              type: string
+            type:
+              type: string
+            state:
+              type: string
+      materials:
+        type: array
+        items:
+          type: object
+          properties:
+            type:
+              type: string
+            quantity:
+              type: string
+      jobs:
+        type: object
+        properties:
+          running:
+            type: integer
+          queued:
+            type: integer
+          details:
+            type: array
+            items:
+              type: object
+              properties:
+                machineid:
+                  type: string
+                type:
+                  type: string
+                vendor:
+                  type: string
+                jobs:
+                  type: array
+                  items:
+                    type: object
+      location:
+        type: object
+        properties:
+          type:
+            type: string
+          coordinates:
+            type: array
+            items:
+              type: integer
+  job:
+      type: object
+      description: Job object
+      properties:
+        userId:
+          type: string
+          format: uuid
+          description: The user unique identifier
+        fablabId:
+          type: string
+          format: uuid
+          description: The fablab unique identifier where job is queued
+        id:
+          type: string
+          format: uuid
+          description: The job unique identifier
+        machineId:
+          type: string
+          format: uuid
+          description: The fablab machine unique identifier
+        status:
+          type: string
+          description: The job status
+          enum:
+            - pending
+            - queued
+            - running
+            - paused
+            - cancelled
+
+        machine:
+          $ref: '#/definitions/machine'
+        material:
+          $ref: '#/definitions/material'
+        process:
+          $ref: '#/definitions/process'
+        pcbFinishing:
+          $ref: '#/definitions/pcbFinishing'
+        waxFinishing:
+          $ref: '#/definitions/waxFinishing'
+
+  jobsArray:
+    type: array
+    items:
+      $ref: '#/definitions/job'
+
+  machine:
+    type: string
+    enum:
+      - Laser cutter
+      - Vinyl cutter
+      - Milling machine
+      - 3D printer
+  material:
+    type: string
+    enum:
+      - vinyl
+      - epoxy
+      - copper
+      - wood
+      - mylar
+      - acrylic
+      - cardboard
+  process:
+    type: string
+    enum:
+      - cut
+      - halftone
+      - wax
+  pcbFinishing:
+    type: string
+    enum:
+      - traces_1_64
+      - outline_1_32
+      - traces_0_010
+  waxFinishing:
+    type: string
+    enum:
+      - rough_cut
+      - finish_cut
