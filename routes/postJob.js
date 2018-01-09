@@ -1,70 +1,79 @@
 var request = require('request');
 var multiparty = require('multiparty');
 var fs = require('fs');
-var getUserId = require('../helpers/permissions').getUserId;
+var checkToken = require('../helpers/permissions');
+var getUserId = checkToken.getUserId;
 
 function postJob (req, res) {
-	var job = req.query;
-	if (checkFields(job)){
-	var form = new multiparty.Form();
-    form.parse(req, function(err, fields, files) {
-      if (files && files.file){
-        job.file = files.file[0].path;
-        var format;
-        if (job.machine === "3D printer"){
-            format = ".gcode";
-        }else{
-            format = ".png";
-        }
-        if (!job.file.endsWith(format)) {
-            res.status(400);
-            res.json({'err': 'Unsupported file format'})
-        } else {
-          checkConsulServers(job.machine, job.material, function (err, availableServers){
-            if (err){
-                res.status(500);
-                res.json(err);
-            }else{
-    	        getNearestFabLab(req.db, job, availableServers, function(err, doc) {
+    var token = req.get("Authentication");
+    checkToken.checkToken(token, function(authorized, payload){
+        if (authorized && payload){
+            var job = req.query;
+            if (checkFields(job)){
+            var form = new multiparty.Form();
+            form.parse(req, function(err, fields, files) {
+              if (files && files.file){
+                job.file = files.file[0].path;
+                var format;
+                if (job.machine === "3D printer"){
+                    format = ".gcode";
+                }else{
+                    format = ".png";
+                }
+                if (!job.file.endsWith(format)) {
+                    res.status(400);
+                    res.json({'err': 'Unsupported file format'})
+                } else {
+                  checkConsulServers(job.machine, job.material, function (err, availableServers){
                     if (err){
                         res.status(500);
                         res.json(err);
                     }else{
-                        if (doc[0]){
-                            //TODO: Send job to pigateway and wait response
-                            if (req.get("Authentication")){
-                                job.userId = getUserId(req.get("Authentication"));
-                                job.fablabId = doc[0]._id;
-                                sendJob(req.db, job, doc, 0, function (err, result){
-                                    if (err){
-                                        res.status(500);
-                                        res.json(err);
-                                    }else{
-                                        res.json(job);
-                                    }
-                                })
+                        getNearestFabLab(req.db, job, availableServers, function(err, doc) {
+                            if (err){
+                                res.status(500);
+                                res.json(err);
                             }else{
-                                res.status(403);
-                                res.json({'err': 'Unauthorized'});
+                                if (doc[0]){
+                                    //TODO: Send job to pigateway and wait response
+                                    if (req.get("Authentication")){
+                                        job.userId = getUserId(req.get("Authentication"));
+                                        job.fablabId = doc[0]._id;
+                                        sendJob(req.db, job, doc, 0, function (err, result){
+                                            if (err){
+                                                res.status(500);
+                                                res.json(err);
+                                            }else{
+                                                res.json(job);
+                                            }
+                                        })
+                                    }else{
+                                        res.status(403);
+                                        res.json({'err': 'Unauthorized'});
+                                    }
+                                }else{
+                                    res.status(400);
+                                    res.json({'err': 'No fablabs available'})
+                                }
                             }
-                        }else{
-                            res.status(400);
-                            res.json({'err': 'No fablabs available'})
-                        }
+                        });
                     }
-                });
-    	    }
-    	  })
-    	}
-      }else{
-        res.status(400);
-        res.json({'err': 'Missing attachment'});
-      }
+                  })
+                }
+              }else{
+                res.status(400);
+                res.json({'err': 'Missing attachment'});
+              }
+            });
+            }else{
+                res.status(400);
+                res.json({'err': 'Incomplete job info'});
+            }
+        }else{
+            res.status(403);
+            res.json({'err': 'Unauthorized'});
+        }
     });
-    }else{
-        res.status(400);
-        res.json({'err': 'Incomplete job info'});
-    }
 }
 
 function checkConsulServers(service, tag, callback){

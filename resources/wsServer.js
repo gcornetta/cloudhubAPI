@@ -11,7 +11,7 @@ wss.on('connection', function connection(ws) {
 
   ws.on('message', function incoming(message) {
     var msg = JSON.parse(message);
-    db.collection('fablabs').findOne({_id: require('mongodb').ObjectID(msg.fablabId)}, function(err, fablab){
+    db.collection('fablabs').findOne({id: msg.id}, function(err, fablab){
         if (err){
             ws.send(JSON.stringify(err));
         }else if (!fablab){
@@ -42,7 +42,7 @@ wss.on('connection', function connection(ws) {
                                 if (err){
                                     ws.send(JSON.stringify(err));
                                 }else{
-                    console.log("serviceDownFinished");
+                                    console.log("serviceDownFinished");
                                     ws.send(JSON.stringify({msg: "Service deleted successfully"}));
                                 }
                             });

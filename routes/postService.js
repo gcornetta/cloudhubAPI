@@ -1,29 +1,38 @@
 var request = require('request');
+var checkToken = require('../helpers/permissions');
 
 function postService (req, res) {
-    var service = req.body;
+    var token = req.get("Authentication");
+    checkToken.checkToken(token, function(authorized, payload){
+        if (authorized && payload){
+            var service = req.body;
 
-    if (checkFields(service)){
-        var id = require('mongodb').ObjectID(service.id);
-        req.db.collection('fablabs').findOne({'_id': id}, function(err, doc) {
-            if (err){
-                res.status(500);
-                res.json(err);
+            if (checkFields(service)){
+                var id = require('mongodb').ObjectID(service.id);
+                req.db.collection('fablabs').findOne({'_id': id}, function(err, doc) {
+                    if (err){
+                        res.status(500);
+                        res.json(err);
+                    }else{
+                        if (doc){
+                            addConsulService(doc, service, function(err, body){
+                                res.json(body);
+                            })
+                        }else{
+                            res.status(400);
+                            res.json({'err': 'Fablab not found'});
+                        }
+                    }
+                });
             }else{
-                if (doc){
-                    addConsulService(doc, service, function(err, body){
-                        res.json(body);
-                    })
-                }else{
-                    res.status(400);
-                    res.json({'err': 'Fablab not found'});
-                }
+                res.status(400);
+                res.json({'err': 'Incomplete JSON'});
             }
-        });
-    }else{
-        res.status(400);
-        res.json({'err': 'Incomplete JSON'});
-    }
+        }else{
+            res.status(403);
+            res.json({'err': 'Unauthorized'});
+        }
+    });
 }
 
 function addConsulService(fablab, service, callback){
