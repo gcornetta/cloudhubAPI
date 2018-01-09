@@ -1,17 +1,18 @@
+# Cloudhub API Specifications
 swagger: "2.0"
-
 info:
   version: 1.0.0
-  title: Piwrapper API
-  description: Piwrapper REST API
-
+  title: Cloudhub API
+  description: Fab Lab Connector API
+# array of all schemes that your API supports
 schemes:
   - http
+# the domain of the service
 host: localhost:3000
-basePath: /
+# will be prefixed to all paths
+basePath: /v1
 produces:
   - application/json
-
 paths:
   /fablabs/connect:
     post:
@@ -27,7 +28,7 @@ paths:
        - name: fablab
          in: body
          required: true
-         description: Fablab pigateway url and port
+         description: Fab Lab pigateway url and port
          schema:
             required:
               - api
@@ -41,7 +42,7 @@ paths:
         200:
           schema:
             $ref: '#/definitions/fablabs'
-          description: A JSON object with the fablab object.
+          description: The Fab Lab JSON object.
         400:
           description: Bad request.
         403:
@@ -68,7 +69,7 @@ paths:
         200:
           schema:
             $ref: '#/definitions/fablabs'
-          description: A JSON object with the fablab object.
+          description: The Fab Lab JSON object.
         400:
           description: Bad request.
         403:
@@ -164,7 +165,6 @@ paths:
           description: Unauthorized.
         500:
           description: Internal server error.
-
 securityDefinitions:
   tokenSecurity:
     type: apiKey
@@ -174,19 +174,18 @@ securityDefinitions:
     type: apiKey
     in: header
     name: Authentication
-
 parameters:
   fablabid:
       name: fablabid
       in: path
       required: true
-      description: The fablab identifier
+      description: The Fab Lab identifier
       type: string
       default: ''
   optionalfablabid:
       name: fablabid
       in: path
-      description: The fablab identifier
+      description: The Fab Lab identifier
       type: string
       default: ''
   job:
@@ -327,16 +326,16 @@ parameters:
 definitions:
   fablabs:
     type: object
-    description: Fablabs object
+    description: Fab Lab object
     properties:
       id:
         type: string
         format: uuid
-        description: The fablab unique identifier
+        description: The Fab Lab unique identifier
       _id:
         type: string
         format: uuid
-        description: The fablab unique identifier
+        description: The Fab Lab unique identifier
       email:
         type: string
       userid:
@@ -347,29 +346,41 @@ definitions:
         type: string
       api:
         type: string
-        description: Fablab wrapper url
+        description: Fab Lab wrapper url
       port:
         type: integer
-        description: Fablab wrapper port
+        description: Fablab wrapper port.
       capacity:
         type: string
       address:
         type: object
+        description: Fab Lab postal address.
         properties:
-          university:
+          display:
             type: string
-          road:
+            description: The address that is displayed.
+          number:
+            type: integer
+            description: Street number.
+          street:
             type: string
+            description: Street name.
+          postcode:
+            type: integer
+            description: The postal code.
           city:
             type: string
+            description: City or town.
           state:
             type: string
-          postcode:
-            type: string
+            description: State or province.
           country:
             type: string
-          country_code:
+            description: The country.
+          code:
             type: string
+            maxLength: 2
+            description: Country code (two characters).
       contact:
         type: object
         properties:
@@ -459,7 +470,7 @@ definitions:
         fablabId:
           type: string
           format: uuid
-          description: The fablab unique identifier where job is queued
+          description: The Fab Lab unique identifier where job is queued
         id:
           type: string
           format: uuid
@@ -467,7 +478,7 @@ definitions:
         machineId:
           type: string
           format: uuid
-          description: The fablab machine unique identifier
+          description: The Fab Lab machine unique identifier
         status:
           type: string
           description: The job status
@@ -477,7 +488,6 @@ definitions:
             - running
             - paused
             - cancelled
-
         machine:
           $ref: '#/definitions/machine'
         material:
@@ -488,12 +498,10 @@ definitions:
           $ref: '#/definitions/pcbFinishing'
         waxFinishing:
           $ref: '#/definitions/waxFinishing'
-
   jobsArray:
     type: array
     items:
       $ref: '#/definitions/job'
-
   machine:
     type: string
     enum:
