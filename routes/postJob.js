@@ -143,7 +143,8 @@ function sendJob(db, job, fablabs, fablabIndex, callback){
             }else if (!JSON.parse(body).code){
                 job.id = JSON.parse(body).jobId;
                 job.machineId = JSON.parse(body).mId;
-                job.status = "queued";
+                job.fablabId = fablab._id;
+                job.status = "pending";
                 db.collection('jobs').insert(job, function(err, doc){
                     if (err){
                         callback(err);

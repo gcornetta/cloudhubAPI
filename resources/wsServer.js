@@ -28,8 +28,6 @@ wss.on('connection', function connection(ws) {
                         if (err){
                             ws.send(JSON.stringify(err));
                         }else{
-
-                            console.log("serviceUpFinished");
                            ws.send(JSON.stringify({msg: "Service added successfully"}));
                         }
                     });
@@ -42,7 +40,6 @@ wss.on('connection', function connection(ws) {
                                 if (err){
                                     ws.send(JSON.stringify(err));
                                 }else{
-                                    console.log("serviceDownFinished");
                                     ws.send(JSON.stringify({msg: "Service deleted successfully"}));
                                 }
                             });
@@ -56,7 +53,6 @@ wss.on('connection', function connection(ws) {
                         if (err){
                             ws.send(JSON.stringify(err));
                         }else{
-                    console.log("fablabDownF");
                            ws.send(JSON.stringify({msg: "Services deleted successfully"}));
                         }
                     });
@@ -73,10 +69,23 @@ wss.on('connection', function connection(ws) {
                         if (err){
                             ws.send(JSON.stringify(err));
                         }else{
-                    console.log("machineStateChangeF");
                            ws.send(JSON.stringify({msg: "Status updated"}));
                         }
                     });
+                break;
+                case "updateJob": //(job)
+                    updateJobStatus(msg.job.jobId, msg.job.status, function(err, doc){
+                        if (err){
+                            console.log(err);
+                        }
+                    })
+                break;
+                case "deleteJob": //(jobId)
+                    deleteJob(msg.jobId, function(err, doc){
+                        if (err){
+                            console.log(err);
+                        }
+                    })
                 break;
             }
         }
@@ -109,4 +118,22 @@ function deregisterConsulService(fablab, service, callback){
                     }
                     callback (err, body);
                 });
+}
+
+function updateJobStatus(jobId, status, callback){
+    db.collection('jobs').updateOne({id: jobId}, {$set:{"status": status}}, callback);
+}
+
+function deleteJob(jobId, callback){
+    db.collection('jobs').removeOne({"id": jobId}, function (err, doc){
+        if (err){
+            callback(err);
+        }else{
+            db.collection('fablabs').updateOne(
+                {"_id": require('mongodb').ObjectID(doc.fablabId),
+                "jobs.details": {$elemMatch: {"jobs": {$elemMatch: {"id": jobId}}}}},
+                { $pull: { "jobs.details.$.jobs": {"id": jobId} }, $inc : {"jobs.queued": -1}}
+            , callback);
+        }
+    });
 }
