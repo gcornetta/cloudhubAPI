@@ -35,7 +35,6 @@ function postJob (req, res) {
                                 res.json(err);
                             }else{
                                 if (doc[0]){
-                                    //TODO: Send job to pigateway and wait response
                                     if (req.get("Authentication")){
                                         job.userId = getUserId(req.get("Authentication"));
                                         job.fablabId = doc[0]._id;
@@ -132,7 +131,6 @@ function sendJob(db, job, fablabs, fablabIndex, callback){
     var formData = {file: fs.createReadStream(job.file)};
     var queryString = JSON.parse(JSON.stringify(job));
     queryString.user = queryString.userId;
-    queryString.process = "cut" //TODO: Delete
     delete queryString.userId;
     delete queryString.file;
     delete queryString.lat;
