@@ -40,7 +40,8 @@ function connectFabLab (req, res) {
                                                             res.status(500);
                                                             res.json(err);
                                                         }else{
-                                                            res.json({"result":docs.result.n});
+                                                            fablab._id = incompleteFablab._id;
+                                                            res.json(fablab);
                                                         }
                                                     });
                                                 }
@@ -85,6 +86,7 @@ function getFablabInfo(fablab, callback){
                     delete fablabObj.coordinates.longitude;
                     delete fablabObj.coordinates.latitude;
                     delete fablabObj.coordinates;
+                    delete fablabObj.id;
                     /*for (machine in fablabObj.equipment){
                         fablabObj.jobs.details.push({
                             'machineId': fablabObj.equipment[machine].id,

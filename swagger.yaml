@@ -10,7 +10,7 @@ schemes:
 # the domain of the service
 host: localhost:3000
 # will be prefixed to all paths
-basePath: /v1
+#basePath: /v1
 produces:
   - application/json
 paths:
@@ -60,7 +60,7 @@ paths:
         - tokenSecurity: []
         - tokenAuth: []
       parameters:
-        - $ref: '#/parameters/optionalfablabid'
+        - $ref: '#/parameters/fablabid'
         - $ref: '#/parameters/limit'
         - $ref: '#/parameters/offset'
         - $ref: '#/parameters/fields'
@@ -154,6 +154,7 @@ paths:
         - $ref: '#/parameters/process'
         - $ref: '#/parameters/pcbFinishing'
         - $ref: '#/parameters/waxFinishing'
+        - $ref: '#/parameters/newtonUser'
       responses:
         200:
           schema:
@@ -179,12 +180,6 @@ parameters:
       name: fablabid
       in: path
       required: true
-      description: The Fab Lab identifier
-      type: string
-      default: ''
-  optionalfablabid:
-      name: fablabid
-      in: path
       description: The Fab Lab identifier
       type: string
       default: ''
@@ -321,6 +316,11 @@ parameters:
     in: query
     required: true
     description: User location (longitude)
+    type: string
+  newtonUser:
+    name: newtonUser
+    in: query
+    description: Alternative userId
     type: string
 
 definitions:
