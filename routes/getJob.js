@@ -5,7 +5,7 @@ function getJob(req, res){
     var token = req.get("Authentication");
     checkToken.checkToken(token, function(authorized, payload){
         if (authorized && payload){
-            var userId = req.query.newtonUser || getUserId(req.get("Authentication"));
+            var userId = req.get("newtonUser") || getUserId(req.get("Authentication"));
             req.db.collection('jobs').find({'userId' : userId}).toArray(function(err, docs) {
                 if (err){
                     res.status(500);
