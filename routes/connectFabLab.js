@@ -67,7 +67,7 @@ function connectFabLab (req, res) {
 }
 
 function getFablabInfo(fablab, callback){
-    var req = request.get({url: 'http://'+fablab.api+ ":" + fablab.port + '/fablab/'}, function(err, res, body) {
+    var req = request.get({url: 'http://'+fablab.api+ ":" + fablab.port + '/v1/fablab/'}, function(err, res, body) {
          console.log(err)
          console.log("res----------------------------------------------")
          console.log(res)
