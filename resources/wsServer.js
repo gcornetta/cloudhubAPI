@@ -73,20 +73,6 @@ wss.on('connection', function connection(ws) {
                         }
                     });
                 break;
-                case "updateJob": //(job)
-                    updateJobStatus(msg.job.jobId, msg.job.status, function(err, doc){
-                        if (err){
-                            console.log(err);
-                        }
-                    })
-                break;
-                case "deleteJob": //(jobId)
-                    deleteJob(msg.jobId, function(err, doc){
-                        if (err){
-                            console.log(err);
-                        }
-                    })
-                break;
             }
         }
     });
