@@ -71,8 +71,13 @@ function getFablabInfo(fablab, callback){
         if (err){
             callback (err);
         }else{
-            if (body){
+            try {
                 var fablabWrapper = JSON.parse(body);
+            } catch (e) {
+                console.log(e);
+                console.log(body);
+            }
+            if (fablabWrapper){
                 var fablabObj = fablabWrapper.fablab;
                 if (fablabObj.coordinates){
                     fablabObj.jobs = fablabWrapper.jobs;
@@ -100,7 +105,7 @@ function getFablabInfo(fablab, callback){
                     callback({"message": "Incomplete fablab"});
                 }
             }else{
-                callback({"message": "fablab not found"});
+                callback({"message": "fablab not found", "response": body});
             }
         }
     });
