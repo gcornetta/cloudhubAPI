@@ -26,7 +26,7 @@ function getFabLabs (req, res) {
                     fields[fieldsArray[i]]=true;
                 }
             }if (req.query.q){
-                var queryArray = req.query.q.split(',');
+                var queryArray = req.query.q.split('+');
                 if (queryArray.length > 0){
                     query.equipment = {$elemMatch:{}};
                     for (var i=0; i<queryArray.length; i++){
