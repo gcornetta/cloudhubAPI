@@ -12,6 +12,7 @@ var express = require('express'),
   http = require('http'),
   path = require('path'),
   mongoUtil = require('./resources/db'),
+  refreshJobs,
   wsServer,
 
   //ROUTES
@@ -31,6 +32,8 @@ mongoUtil.connectToServer(function(err, db){
     if (!err){
         globalDB = db;
         wsServer = require('./resources/wsServer');
+        refreshJobs = require('./resources/refreshJobs');
+        refreshJobs.refreshJobs();
     }else{
         console.error("\x1b[31m", err);
     }
@@ -44,6 +47,7 @@ app.use(function (req, res, next) {
    res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,PATCH,OPTIONS');
    res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization, Authentication');
    req.db = globalDB;
+   req.refreshJobs = refreshJobs;
    next();
 });
 

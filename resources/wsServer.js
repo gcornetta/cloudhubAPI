@@ -105,21 +105,3 @@ function deregisterConsulService(fablab, service, callback){
                     callback (err, body);
                 });
 }
-
-function updateJobStatus(jobId, status, callback){
-    db.collection('jobs').updateOne({id: jobId}, {$set:{"status": status}}, callback);
-}
-
-function deleteJob(jobId, callback){
-    db.collection('jobs').removeOne({"id": jobId}, function (err, doc){
-        if (err){
-            callback(err);
-        }else{
-            db.collection('fablabs').updateOne(
-                {"_id": require('mongodb').ObjectID(doc.fablabId),
-                "jobs.details": {$elemMatch: {"jobs": {$elemMatch: {"id": jobId}}}}},
-                { $pull: { "jobs.details.$.jobs": {"id": jobId} }, $inc : {"jobs.queued": -1}}
-            , callback);
-        }
-    });
-}
