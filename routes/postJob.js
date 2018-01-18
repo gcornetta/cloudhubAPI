@@ -27,13 +27,11 @@ function postJob (req, res) {
                   checkConsulServers(job.machine, job.material, function (err, availableServers){
                     if (err){
                         res.status(500);
-                        console.log("err consul");
                         res.json(err);
                     }else{
                         getNearestFabLab(req.db, job, availableServers, function(err, doc) {
                             if (err){
                                 res.status(500);
-                                console.log("err db");
                                 res.json(err);
                             }else{
                                 if (doc[0]){
@@ -45,7 +43,6 @@ function postJob (req, res) {
                                         sendJob(req.db, job, doc, 0, function (err, result){
                                             if (err){
                                                 res.status(500);
-                        console.log("err sendJob");
                                                 res.json(err);
                                             }else{
                                                 res.json(job);
@@ -80,6 +77,16 @@ function postJob (req, res) {
     });
 }
 
+console.log(process.env.CONSUL_ADDR);
+request.get(process.env.CONSUL_ADDR +'/v1/catalog/service/'+service.toLowerCase()+tag, function(err, res, body) {
+        if (err){
+            console.log(err);
+        }else{
+            console.log(res)
+            console.log(body)
+        }
+    });
+
 function checkConsulServers(service, tag, callback){
     var serversCritical = [];
     var resultArray = [];
@@ -90,6 +97,7 @@ function checkConsulServers(service, tag, callback){
     }
     request.get(process.env.CONSUL_ADDR +'/v1/catalog/service/'+service.toLowerCase()+tag, function(err, res, body) {
         if (err){
+            console.log(err);
             callback (err, resultArray);
         }else{
             if (!body){
