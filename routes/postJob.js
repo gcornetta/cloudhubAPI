@@ -77,18 +77,6 @@ function postJob (req, res) {
     });
 }
 
-console.log(process.env.CONSUL_ADDR+'/v1/catalog/service/3d printer');
-var url = process.env.CONSUL_ADDR+'/v1/catalog/service/3d printer';
-url = url.replace(" ","%20");
-request.get(url, function(err, res, body) {
-        if (err){
-            console.log(err);
-        }else{
-            console.log(res)
-            console.log(body)
-        }
-    });
-
 function checkConsulServers(service, tag, callback){
     var serversCritical = [];
     var resultArray = [];
@@ -97,8 +85,9 @@ function checkConsulServers(service, tag, callback){
     }else{
         tag = "?tag="+tag.toLowerCase()
     }
-    console.log(process.env.CONSUL_ADDR +'/v1/catalog/service/'+service.toLowerCase()+tag)
-    request.get(process.env.CONSUL_ADDR +'/v1/catalog/service/'+service.toLowerCase()+tag, function(err, res, body) {
+    var url = process.env.CONSUL_ADDR +'/v1/catalog/service/'+service.toLowerCase()+tag;
+    url = url.replace(" ","%20");
+    request.get(url, function(err, res, body) {
         if (err){
             console.log(err);
             callback (err, resultArray);
