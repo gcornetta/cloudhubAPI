@@ -1,5 +1,6 @@
 var request = require('request');
 var checkToken = require('../helpers/permissions');
+//var getAndUpdateFablabJobs = require('../resources/refreshJobs').getAndUpdateFablabJobs;
 
 function connectFabLab (req, res) {
     var token = req.get("Authentication");
@@ -41,6 +42,7 @@ function connectFabLab (req, res) {
                                                             res.json(err);
                                                         }else{
                                                             fablab._id = incompleteFablab._id;
+                                                            getAndUpdateFablabJobs(fablab);
                                                             res.json(fablab);
                                                         }
                                                     });
@@ -67,7 +69,7 @@ function connectFabLab (req, res) {
 }
 
 function getFablabInfo(fablab, callback){
-    var req = request.get({url: 'http://'+fablab.api+ ":" + fablab.port + '/v1/fablab/'}, function(err, res, body) {
+    var req = request.get({url: 'http://'+fablab.api+ ":" + fablab.port + '/fablab/'}, function(err, res, body) {
         if (err){
             callback (err);
         }else{
@@ -92,14 +94,6 @@ function getFablabInfo(fablab, callback){
                     delete fablabObj.coordinates.latitude;
                     delete fablabObj.coordinates;
                     delete fablabObj.id;
-                    /*for (machine in fablabObj.equipment){
-                        fablabObj.jobs.details.push({
-                            'machineId': fablabObj.equipment[machine].id,
-                            'type': fablabObj.equipment[machine].type,
-                            'vendor': fablabObj.equipment[machine].vendor,
-                            'jobs': []
-                        })
-                    }*/
                     callback(null, fablabObj);
                 }else{
                     callback({"message": "Incomplete fablab"});
@@ -109,82 +103,6 @@ function getFablabInfo(fablab, callback){
             }
         }
     });
-
-    //TEST
-/*let fablabWrapper = {
-  fablab: {
-    id: '5a05d341e3de134066da700d',
-    name: 'FabLab@CEU',
-    web: 'http://www.xxxxxx',
-    api: "localhost",
-    capacity: 0,
-    address: {
-      street: 'Avda. de Montepríncipe S/N',
-      postCode: '28668',
-      state: 'Madrid',
-      country: 'Spain',
-      countryCode: 'ES'
-    },
-    coordinates: {
-      latitude: 40.3999665,
-      longitude: -3.8354167
-    },
-    contact: {
-      name: 'Covadonga Lorenzo',
-      charge: 'Fab Lab Directress',
-      email: 'clorenzo@ceu.es'
-    },
-    openingDays: [
-      {day: 'monday', from: '9:00', to: '17:00'},
-      {day: 'tueday', from: '9:00', to: '17:00'},
-      {day: 'wednday', from: '9:00', to: '17:00'},
-      {day: 'thursday', from: '9:00', to: '17:00'},
-      {day: 'friday', from: '9:00', to: '17:00'}
-    ],
-    equipment: [{"id": "1a234bc",
-                		"type": "Milling machine",
-                		"vendor": "roland",
-                		"name": "ñalskdfj",
-                		"status": "waiting",
-                		"jobsQueued": 0},
-                		{"id": "2b234zz",
-                		"type": "3D printer",
-                		"vendor": "prusa",
-                		"name": "añlasdfj",
-                		"status": "waiting",
-                		"jobsQueued": 0}],
-    materials: [{"type": "wood",
-                		"quantity": 100
-                		}]
-  },
-  jobs: {
-    running: 0,
-    queued:  0,
-    details: []
-  }
-}
-var fablabObj = fablabWrapper.fablab;
-                fablabObj.jobs = fablabWrapper.jobs;
-                fablabObj._id = require('mongodb').ObjectID(fablab._id);
-                delete fablabObj.id;
-                fablabObj.api = fablab.api;
-                fablabObj.port = fablab.port || 80;
-                fablabObj.location = {
-                    'type': "Point",
-                    'coordinates': [fablabObj.coordinates.longitude, fablabObj.coordinates.latitude]
-                }
-                delete fablabObj.coordinates.longitude;
-                delete fablabObj.coordinates.latitude;
-                delete fablabObj.coordinates;
-for (machine in fablabObj.equipment){
-                    fablabObj.jobs.details.push({
-                        'machineId': fablabObj.equipment[machine].id,
-                        'type': fablabObj.equipment[machine].type,
-                        'vendor': fablabObj.equipment[machine].vendor,
-                        'jobs': []
-                    })
-                }
-                callback(null, fablabObj);*/
 }
 
 function registerServices(fablab, machines, materials, callback){
