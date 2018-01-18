@@ -78,7 +78,9 @@ function postJob (req, res) {
 }
 
 console.log(process.env.CONSUL_ADDR+'/v1/catalog/service/3d printer');
-request.get(process.env.CONSUL_ADDR+'/v1/catalog/service/3d printer', function(err, res, body) {
+var url = process.env.CONSUL_ADDR+'/v1/catalog/service/3d printer';
+url = encodeURIComponent(url.trim())
+request.get(url, function(err, res, body) {
         if (err){
             console.log(err);
         }else{
