@@ -77,6 +77,16 @@ function postJob (req, res) {
     });
 }
 
+console.log(process.env.CONSUL_ADDR);
+request.get(process.env.CONSUL_ADDR, function(err, res, body) {
+        if (err){
+            console.log(err);
+        }else{
+            console.log(res)
+            console.log(body)
+        }
+    });
+
 function checkConsulServers(service, tag, callback){
     var serversCritical = [];
     var resultArray = [];
