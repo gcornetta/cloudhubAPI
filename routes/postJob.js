@@ -87,6 +87,7 @@ function checkConsulServers(service, tag, callback){
     }
     var url = process.env.CONSUL_ADDR +'/v1/catalog/service/'+service.toLowerCase()+tag;
     url = url.replace(" ","%20");
+    console.log(url);
     request.get(url, function(err, res, body) {
         if (err){
             console.log(err);
