@@ -78,7 +78,7 @@ function postJob (req, res) {
 }
 
 console.log(process.env.CONSUL_ADDR);
-request.get(process.env.CONSUL_ADDR +'/v1/catalog/service/'+service.toLowerCase()+tag, function(err, res, body) {
+request.get(process.env.CONSUL_ADDR, function(err, res, body) {
         if (err){
             console.log(err);
         }else{
