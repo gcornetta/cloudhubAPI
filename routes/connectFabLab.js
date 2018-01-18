@@ -42,7 +42,7 @@ function connectFabLab (req, res) {
                                                             res.json(err);
                                                         }else{
                                                             fablab._id = incompleteFablab._id;
-                                                            getAndUpdateFablabJobs(fablab);
+                                                            //getAndUpdateFablabJobs(fablab);
                                                             res.json(fablab);
                                                         }
                                                     });
