@@ -90,8 +90,7 @@ function getAndInsertJob(fablab, jobId){
                         console.log(job);
                         db.collection('jobs').insert(job, function(err, res){
                             console.log("insertJOb---------------")
-                            console.log(err)
-                            //console.log(res)
+                            if (err) {console.log("error")}else{console.log("bien")}
                         });
                     }
                 }
