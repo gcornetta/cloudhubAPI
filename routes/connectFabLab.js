@@ -160,7 +160,7 @@ function addConsulService(fablab, service, callback){
                                                   "http": "http://"+fablab.api+":"+fablab.port /*TEST*/ + "/fablab",
                                                   "interval": "30s",
                                                   "timeout": "1s"
-                                                 });
+                                                 }});
                     console.log(err);
                     console.log(body);
                     callback (err, body);
