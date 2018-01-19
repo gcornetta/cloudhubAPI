@@ -149,7 +149,18 @@ function addConsulService(fablab, service, callback){
                         body = {};
                     }
                     console.log(process.env.CONSUL_ADDR +'/v1/agent/service/register')
-                    console.log(json);
+                    console.log({
+                                                "ID": fablab._id + "_" + service.machine.toLowerCase(),
+                                                "Name": service.machine.toLowerCase(),
+                                                "Tags": service.material,
+                                                "EnableTagOverride": true,
+                                                "Address": fablab.api,
+                                                "Port": fablab.port,
+                                                "check": {
+                                                  "http": "http://"+fablab.api+":"+fablab.port /*TEST*/ + "/fablab",
+                                                  "interval": "30s",
+                                                  "timeout": "1s"
+                                                 });
                     console.log(err);
                     console.log(body);
                     callback (err, body);
