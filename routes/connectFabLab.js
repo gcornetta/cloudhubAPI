@@ -148,6 +148,8 @@ function addConsulService(fablab, service, callback){
                     if (!body){
                         body = {};
                     }
+                    console.log(err);
+                    console.log(body);
                     callback (err, body);
                 });
 }
