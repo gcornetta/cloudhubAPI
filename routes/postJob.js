@@ -37,6 +37,7 @@ function postJob (req, res) {
                                 if (doc[0]){
                                     if (req.get("Authentication")){
                                         job.userId = req.get("newtonUser") || getUserId(req.get("Authentication"));
+                                        job.username = payload.email;
                                         delete job.newtonUser;
                                         job.userCloudhub = getUserId(req.get("Authentication"));
                                         job.fablabId = doc[0]._id;
