@@ -96,7 +96,7 @@ function deregisterServices(fablab, machines, callback){
 
 function deregisterConsulService(fablab, service, callback){
     request.post({
-        method: 'POST',
+        method: 'PUT',
         uri: process.env.CONSUL_ADDR +'/v1/agent/service/deregister/'+fablab._id + "_" + service.machine.toLowerCase()
     }, function(err, res, body) {
                     if (!body){

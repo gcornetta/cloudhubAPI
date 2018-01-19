@@ -129,7 +129,7 @@ function addConsulService(fablab, service, callback){
         service.material = [];
     }
     request.post({
-        method: 'POST',
+        method: 'PUT',
         uri: process.env.CONSUL_ADDR +'/v1/agent/service/register',
         json: {
                 "ID": fablab._id + "_" + service.machine.toLowerCase(),
@@ -148,21 +148,6 @@ function addConsulService(fablab, service, callback){
                     if (!body){
                         body = {};
                     }
-                    console.log(process.env.CONSUL_ADDR +'/v1/agent/service/register')
-                    console.log({
-                                                "ID": fablab._id + "_" + service.machine.toLowerCase(),
-                                                "Name": service.machine.toLowerCase(),
-                                                "Tags": service.material,
-                                                "EnableTagOverride": true,
-                                                "Address": fablab.api,
-                                                "Port": fablab.port,
-                                                "check": {
-                                                  "http": "http://"+fablab.api+":"+fablab.port /*TEST*/ + "/fablab",
-                                                  "interval": "30s",
-                                                  "timeout": "1s"
-                                                 }});
-                    console.log(err);
-                    console.log(body);
                     callback (err, body);
                 });
 }

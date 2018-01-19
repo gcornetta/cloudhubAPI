@@ -44,7 +44,7 @@ function addConsulService(fablab, service, callback){
         service.material = [];
     }
     request.post({
-        method: 'POST',
+        method: 'PUT',
         uri: process.env.CONSUL_ADDR +'/v1/agent/service/register',
         json: {
                 "ID": fablab._id + "_" + service.machine.toLowerCase(),

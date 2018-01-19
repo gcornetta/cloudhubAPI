@@ -88,21 +88,32 @@ function checkConsulServers(service, tag, callback){
     }
     var url = process.env.CONSUL_ADDR +'/v1/catalog/service/'+service.toLowerCase()+tag;
     url = url.replace(" ","%20");
-    console.log(url);
     request.get(url, function(err, res, body) {
+        console.log(process.env.CONSUL_ADDR +'/v1/catalog/service/'+service.toLowerCase()+tag)
+        console.log(err)
+        console.log(body)
         if (err){
             console.log(err);
             callback (err, resultArray);
         }else{
-            if (!body){
-                body = '{}';
+            var services = {};
+            try {
+                services = JSON.parse(body);
+            } catch (e) {
+                console.log(e);
+                console.log(body);
             }
-            var services = JSON.parse(body);
             request.get(process.env.CONSUL_ADDR +'/v1/health/state/critical', function(err, res, body) {
-                if (!body){
-                    body = '{}';
+        console.log(process.env.CONSUL_ADDR +'/v1/health/state/critical')
+        console.log(err)
+        console.log(body)
+                var critical = {};
+                try {
+                    critical = JSON.parse(body);
+                } catch (e) {
+                    console.log(e);
+                    console.log(body);
                 }
-                var critical = JSON.parse(body);
                 for (var i in critical){
                     if(critical[i].ServiceID){
     	                serversCritical.push(critical[i].ServiceID);
@@ -145,38 +156,50 @@ function sendJob(db, job, fablabs, fablabIndex, callback){
     var req = request.post({url: 'http://'+fablab.api +':'+ fablab.port +'/fablab/jobs', qs: queryString, formData: formData}, function(err, res, body) {
             if (err){
                 callback (err);
-            }else if (!JSON.parse(body).code){
-                job.id = JSON.parse(body).jobId;
-                job.machineId = JSON.parse(body).mId;
-                job.fablabId = fablab._id;
-                job.status = "pending";
-                db.collection('jobs').insert(job, function(err, doc){
-                    if (err){
-                        callback(err);
+            }else {
+                try {
+                    var parsedResponse = JSON.parse(body);
+                } catch (e) {
+                    console.log(e);
+                    console.log(body);
+                }
+                if (parsedResponse){
+                    if (!parsedResponse.code){
+                        job.id = parsedResponse.jobId;
+                        job.machineId = parsedResponse.mId;
+                        job.fablabId = fablab._id;
+                        job.status = "pending";
+                        db.collection('jobs').insert(job, function(err, doc){
+                            if (err){
+                                callback(err);
+                            }else{
+                                db.collection('fablabs').updateOne(
+                                    {"_id": fablab._id, "jobs.details.machineId": job.machineId},
+                                    { $push: { "jobs.details.$.jobs": job }, $inc : {"jobs.queued": 1} },
+                                    callback);
+                            }
+                        });
                     }else{
-                        db.collection('fablabs').updateOne(
-                            {"_id": fablab._id, "jobs.details.machineId": job.machineId},
-                            { $push: { "jobs.details.$.jobs": job }, $inc : {"jobs.queued": 1} },
-                            callback);
-                    }
-                });
-            }else{
-                switch (JSON.parse(body).code){
-                    case 7: //Fablab busy. Try next fablab
-                        if (fablabs[fablabIndex+1]){
-                            sendJob(db, job, fablabs, fablabIndex+1, callback);
-                        }else{
-                            callback({'err': 'No fablabs available'})
+                        switch (parsedResponse.code){
+                            case 7: //Fablab busy. Try next fablab
+                                if (fablabs[fablabIndex+1]){
+                                    sendJob(db, job, fablabs, fablabIndex+1, callback);
+                                }else{
+                                    callback({'err': 'No fablabs available'})
+                                }
+                            break;
+                            case 3: //Fablab object not built yet. Try again after 1 second
+                                setTimeout(function(){
+                                    sendJob(db, job, fablabs, fablabIndex, callback);
+                                }, 1000);
+                            break;
+                            default:
+                                callback(parsedResponse);
+                            break;
                         }
-                    break;
-                    case 3: //Fablab object not built yet. Try again after 1 second
-                        setTimeout(function(){
-                            sendJob(db, job, fablabs, fablabIndex, callback);
-                        }, 1000);
-                    break;
-                    default:
-                        callback(JSON.parse(body));
-                    break;
+                    }
+                }else{
+                    callback(body);
                 }
             }
         });
