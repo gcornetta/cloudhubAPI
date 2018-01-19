@@ -12,6 +12,8 @@ function getFabLabs (req, res) {
                 skip : 0
             }
             if (req.params.fablabId){
+                console.log("param")
+                console.log(req.params.fablabId)
                 query = {'_id': require('mongodb').ObjectID(req.params.fablabId)}
             }
             if (req.query.limit){
