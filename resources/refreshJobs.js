@@ -62,7 +62,7 @@ function getAndUpdateFablabJobs(fablab){
             console.log(fablab.port)
             console.log(res.result.nModified)
                                     if (res.result.nModified === 0){
-                                        getAndInsertJob(jobs[fab].jobs[j].id);
+                                        getAndInsertJob(fablab, jobs[fab].jobs[j].id);
                                     }
                                 });
                             }
@@ -75,7 +75,7 @@ function getAndUpdateFablabJobs(fablab){
     }
 }
 
-function getAndInsertJob(jobId){
+function getAndInsertJob(fablab, jobId){
     var req = request.get({url: 'http://'+fablab.api+ ":" + fablab.port + '/fablab/jobs/status/'+jobId}, function(err, res, body) {
                 if (err){
                     console.log (err);
