@@ -40,10 +40,6 @@ function getAndUpdateFablabJobs(fablab){
             clearInterval(updating[fablab._id]);
         }
         var interval = setInterval(function(){
-            console.log("refresh----------------------------------------")
-            console.log(fablab._id)
-            console.log(fablab.api)
-            console.log(fablab.port)
             var req = request.get({url: 'http://'+fablab.api+ ":" + fablab.port + '/fablab/'}, function(err, res, body) {
                 if (err){
                     console.log (err);
@@ -59,7 +55,13 @@ function getAndUpdateFablabJobs(fablab){
                         for (var fab in jobs){
                             for (var j in jobs[fab].jobs){
                                 //console.log(jobs[fab].jobs[j]);
-                                updateJobStatus(jobs[fab].jobs[j].id, jobs[fab].jobs[j].status);
+                                updateJobStatus(jobs[fab].jobs[j].id, jobs[fab].jobs[j].status, function (err, res){
+            console.log("refresh----------------------------------------")
+            console.log(fablab._id)
+            console.log(fablab.api)
+            console.log(fablab.port)
+                                    console.log(res);
+                                });
                             }
                         }
                     }
