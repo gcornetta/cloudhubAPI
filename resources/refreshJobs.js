@@ -60,8 +60,8 @@ function getAndUpdateFablabJobs(fablab){
             console.log(fablab._id)
             console.log(fablab.api)
             console.log(fablab.port)
-            console.log(res.nModified)
-                                    if (res.nModified === 0){
+            console.log(res.result.nModified)
+                                    if (res.result.nModified === 0){
                                         getAndInsertJob(jobs[fab].jobs[j].id);
                                     }
                                 });
