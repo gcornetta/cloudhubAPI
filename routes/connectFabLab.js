@@ -148,6 +148,8 @@ function addConsulService(fablab, service, callback){
                     if (!body){
                         body = {};
                     }
+                    console.log(process.env.CONSUL_ADDR +'/v1/agent/service/register')
+                    console.log(json);
                     console.log(err);
                     console.log(body);
                     callback (err, body);
