@@ -10,7 +10,6 @@ function refreshJobs(){
             console.log(err);
         }else{
             for (var f in fablabs){
-                console.log(fablabs[f])
                 getAndUpdateFablabJobs(fablabs[f]);
             }
         }
