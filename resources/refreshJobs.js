@@ -10,7 +10,6 @@ function refreshJobs(){
             console.log(err);
         }else{
             for (var f in fablabs){
-                console.log(fablabs[f])
                 getAndUpdateFablabJobs(fablabs[f]);
             }
         }
@@ -41,10 +40,6 @@ function getAndUpdateFablabJobs(fablab){
             clearInterval(updating[fablab._id]);
         }
         var interval = setInterval(function(){
-            console.log("refresh----------------------------------------")
-            console.log(fablab._id)
-            console.log(fablab.api)
-            console.log(fablab.port)
             var req = request.get({url: 'http://'+fablab.api+ ":" + fablab.port + '/fablab/'}, function(err, res, body) {
                 if (err){
                     console.log (err);
@@ -60,7 +55,11 @@ function getAndUpdateFablabJobs(fablab){
                         for (var fab in jobs){
                             for (var j in jobs[fab].jobs){
                                 //console.log(jobs[fab].jobs[j]);
-                                updateJobStatus(jobs[fab].jobs[j].id, jobs[fab].jobs[j].status);
+                                updateJobStatus(jobs[fab].jobs[j].id, jobs[fab].jobs[j].status, function (err, res){
+                                    if (res.result.n === 0){
+                                        getAndInsertJob(fablab, jobs[fab].jobs[j].id);
+                                    }
+                                });
                             }
                         }
                     }
@@ -69,6 +68,28 @@ function getAndUpdateFablabJobs(fablab){
         }, 30000);
         updating[fablab._id] = interval;
     }
+}
+
+function getAndInsertJob(fablab, jobId){
+    var req = request.get({url: 'http://'+fablab.api+ ":" + fablab.port + '/fablab/jobs/status/'+jobId}, function(err, res, body) {
+                if (err){
+                    console.log (err);
+                }else{
+                    try {
+                        var job = JSON.parse(body);
+                    } catch (e) {
+                        console.log(e);
+                        console.log(body);
+                    }
+                    if (job){
+                        db.collection('jobs').updateOne({id: jobId}, {$set: job}, {upsert: true}, function(err, res){
+                            if (err){
+                                console.log(err);
+                            }
+                        });
+                    }
+                }
+    });
 }
 
 exports.refreshJobs = refreshJobs;
