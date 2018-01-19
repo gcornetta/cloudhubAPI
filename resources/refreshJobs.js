@@ -5,11 +5,13 @@ var updating = {};
 var db = mongoUtil.getDB();
 
 function refreshJobs(){
+    console.log("llamado refreshjobs")
     db.collection('fablabs').find({}).toArray(function(err, fablabs) {
         if (err){
             console.log(err);
         }else{
             for (var f in fablabs){
+                console.log(fablabs[f]._id);
                 getAndUpdateFablabJobs(fablabs[f]);
             }
         }
