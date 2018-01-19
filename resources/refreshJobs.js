@@ -1,5 +1,6 @@
 var request = require('request');
 const mongoUtil = require('./db');
+var updating = {};
 
 var db = mongoUtil.getDB();
 
@@ -36,31 +37,37 @@ function deleteJob(jobId, callback){
 
 function getAndUpdateFablabJobs(fablab){
     if ((fablab.api)&&(fablab.port)){
-    setInterval(function(){
-        //console.log("refresh----------------------------------------")
-        //console.log(fablab.api)
-        var req = request.get({url: 'http://'+fablab.api+ ":" + fablab.port + '/fablab/'}, function(err, res, body) {
-            if (err){
-                console.log (err);
-            }else{
-                try {
-                    var fablabWrapper = JSON.parse(body);
-                } catch (e) {
-                    console.log(e);
-                    console.log(body);
-                }
-                if (fablabWrapper){
-                    var jobs = fablabWrapper.jobs.details;
-                    for (var fab in jobs){
-                        for (var j in jobs[fab].jobs){
-                            //console.log(jobs[fab].jobs[j]);
-                            updateJobStatus(jobs[fab].jobs[j].id, jobs[fab].jobs[j].status);
+        if (updating[fablab._id]){
+            clearInterval(updating[fablab._id]);
+        }
+        var interval = setInterval(function(){
+            console.log("refresh----------------------------------------")
+            console.log(fablab._id)
+            console.log(fablab.api)
+            console.log(fablab.port)
+            var req = request.get({url: 'http://'+fablab.api+ ":" + fablab.port + '/fablab/'}, function(err, res, body) {
+                if (err){
+                    console.log (err);
+                }else{
+                    try {
+                        var fablabWrapper = JSON.parse(body);
+                    } catch (e) {
+                        console.log(e);
+                        console.log(body);
+                    }
+                    if (fablabWrapper){
+                        var jobs = fablabWrapper.jobs.details;
+                        for (var fab in jobs){
+                            for (var j in jobs[fab].jobs){
+                                //console.log(jobs[fab].jobs[j]);
+                                updateJobStatus(jobs[fab].jobs[j].id, jobs[fab].jobs[j].status);
+                            }
                         }
                     }
                 }
-            }
-        });
-    }, 30000);
+            });
+        }, 30000);
+        updating[fablab._id] = interval;
     }
 }
 
