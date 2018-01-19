@@ -60,7 +60,7 @@ function getAndUpdateFablabJobs(fablab){
             console.log(fablab._id)
             console.log(fablab.api)
             console.log(fablab.port)
-                                    console.log(res);
+            console.log(res.nModified)
                                     if (res.nModified === 0){
                                         getAndInsertJob(jobs[fab].jobs[j].id);
                                     }
@@ -91,7 +91,7 @@ function getAndInsertJob(jobId){
                         db.collection('jobs').insert(job, function(err, res){
                             console.log("insertJOb---------------")
                             console.log(err)
-                            console.log(res)
+                            //console.log(res)
                         });
                     }
                 }
