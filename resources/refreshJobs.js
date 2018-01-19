@@ -12,6 +12,8 @@ function refreshJobs(){
         }else{
             for (var f in fablabs){
                 console.log(fablabs[f]._id);
+                console.log(fablabs[f].id);
+                console.log("------------");
                 getAndUpdateFablabJobs(fablabs[f]);
             }
         }
