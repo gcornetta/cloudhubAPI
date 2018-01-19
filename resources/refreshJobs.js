@@ -61,6 +61,9 @@ function getAndUpdateFablabJobs(fablab){
             console.log(fablab.api)
             console.log(fablab.port)
                                     console.log(res);
+                                    if (res.nModified === 0){
+                                        getAndInsertJob(jobs[fab].jobs[j].id);
+                                    }
                                 });
                             }
                         }
@@ -70,6 +73,29 @@ function getAndUpdateFablabJobs(fablab){
         }, 30000);
         updating[fablab._id] = interval;
     }
+}
+
+function getAndInsertJob(jobId){
+    var req = request.get({url: 'http://'+fablab.api+ ":" + fablab.port + '/fablab/jobs/status/'+jobId}, function(err, res, body) {
+                if (err){
+                    console.log (err);
+                }else{
+                    try {
+                        var job = JSON.parse(body);
+                    } catch (e) {
+                        console.log(e);
+                        console.log(body);
+                    }
+                    if (job){
+                        console.log(job);
+                        db.collection('jobs').insert(job, function(err, res){
+                            console.log("insertJOb---------------")
+                            console.log(err)
+                            console.log(res)
+                        });
+                    }
+                }
+    });
 }
 
 exports.refreshJobs = refreshJobs;
