@@ -90,10 +90,6 @@ function checkConsulServers(service, tag, callback){
     url = url.replace(" ","%20");
     request.get(url, function(err, res, body) {
         console.log(url)
-        url = process.env.CONSUL_ADDR +'/v1/catalog/service/'+service.toLowerCase()+tag;
-        url = url.replace(" ","$");
-        console.log(url)
-        console.log(err)
         console.log(body)
         if (err){
             console.log(err);
@@ -107,9 +103,8 @@ function checkConsulServers(service, tag, callback){
                 console.log(body);
             }
             request.get(process.env.CONSUL_ADDR +'/v1/health/state/critical', function(err, res, body) {
-        console.log(process.env.CONSUL_ADDR +'/v1/health/state/critical')
-        console.log(err)
-        console.log(body)
+                console.log(process.env.CONSUL_ADDR +'/v1/health/state/critical')
+                console.log(body)
                 var critical = {};
                 try {
                     critical = JSON.parse(body);
@@ -128,6 +123,8 @@ function checkConsulServers(service, tag, callback){
     	                resultArray.push(services[i].ServiceID);
         	        }
     	        }
+    	        console.log("serversUp");
+    	        console.log(resultArray);
                 callback (err, resultArray);
             });
         }
