@@ -35,6 +35,8 @@ function connectFabLab (req, res) {
                                                     res.status(500);
                                                     res.json(err);
                                                 }else{
+                                                    console.log(fablab._id)
+                                                    console.log(incompleteFablab._id)
                                                     delete fablab._id;
                                                     req.db.collection('fablabs').update({_id: require('mongodb').ObjectID(incompleteFablab._id)}, {$set:fablab}, function(err, docs) {
                                                         if (err){
