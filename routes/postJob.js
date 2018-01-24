@@ -29,11 +29,15 @@ function postJob (req, res) {
                         res.status(500);
                         res.json(err);
                     }else{
+                        console.log("availableServers");
+                        console.log(availableServers);
                         getNearestFabLab(req.db, job, availableServers, function(err, doc) {
                             if (err){
                                 res.status(500);
                                 res.json(err);
                             }else{
+                                console.log("doc")
+                                console.log(doc)
                                 if (doc[0]){
                                     if (req.get("Authentication")){
                                         job.userId = req.get("newtonUser") || getUserId(req.get("Authentication"));
@@ -89,8 +93,6 @@ function checkConsulServers(service, tag, callback){
     var url = process.env.CONSUL_ADDR +'/v1/catalog/service/'+service.toLowerCase()+tag;
     url = url.replace(" ","%20");
     request.get(url, function(err, res, body) {
-        console.log(url)
-        console.log(body)
         if (err){
             console.log(err);
             callback (err, resultArray);
@@ -103,8 +105,6 @@ function checkConsulServers(service, tag, callback){
                 console.log(body);
             }
             request.get(process.env.CONSUL_ADDR +'/v1/health/state/critical', function(err, res, body) {
-                console.log(process.env.CONSUL_ADDR +'/v1/health/state/critical')
-                console.log(body)
                 var critical = {};
                 try {
                     critical = JSON.parse(body);
@@ -123,8 +123,6 @@ function checkConsulServers(service, tag, callback){
     	                resultArray.push(services[i].ServiceID);
         	        }
     	        }
-    	        console.log("serversUp");
-    	        console.log(resultArray);
                 callback (err, resultArray);
             });
         }
