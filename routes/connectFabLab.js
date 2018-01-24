@@ -130,6 +130,7 @@ function addConsulService(fablab, service, callback){
     }else{
         service.material = [];
     }
+    console.log("add consul service: "+ fablab._id + "_" + service.machine.toLowerCase())
     request.post({
         method: 'PUT',
         uri: process.env.CONSUL_ADDR +'/v1/agent/service/register',

@@ -5,7 +5,6 @@ var updating = {};
 var db = mongoUtil.getDB();
 
 function refreshJobs(){
-    console.log("llamado refreshjobs")
     db.collection('fablabs').find({}).toArray(function(err, fablabs) {
         if (err){
             console.log(err);
