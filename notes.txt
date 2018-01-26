@@ -1,7 +1,7 @@
 CloudhubAPI
 
 - MongoDB
-- Añadir indice para busquedas geoespaciales: db.fablabs.createIndex({location: ‘2dsphere’})
+- Añadir indice para busquedas geoespaciales: db.fablabs.createIndex({location: '2dsphere'})
 
 
 - Auth0

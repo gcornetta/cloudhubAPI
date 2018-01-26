@@ -82,7 +82,7 @@ wss.on('connection', function connection(ws) {
 function deregisterServices(fablab, machines, callback){
     var nextMachine = machines.pop();
     if (nextMachine){
-        deregisterConsulService(fablab, {machine: nextMachine.type}, function(err, body){
+        deregisterConsulService(fablab, {machine: nextMachine.type}, 10, function(err, body){
             if (err){
                 callback(err);
             }else{
@@ -94,14 +94,18 @@ function deregisterServices(fablab, machines, callback){
     }
 }
 
-function deregisterConsulService(fablab, service, callback){
-    request.post({
+function deregisterConsulService(fablab, service, retries, callback){
+    request({
         method: 'PUT',
         uri: process.env.CONSUL_ADDR +'/v1/agent/service/deregister/'+fablab._id + "_" + service.machine.toLowerCase()
     }, function(err, res, body) {
-                    if (!body){
-                        body = {};
+                    if ((body || err)&&(retries > 0)){
+                        deregisterConsulService(fablab, service, retries-1, callback)
+                    }else{
+                        if (body && (!err)){
+                            err = body;
+                        }
+                        callback (err, body);
                     }
-                    callback (err, body);
                 });
 }
