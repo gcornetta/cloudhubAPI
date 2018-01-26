@@ -112,6 +112,10 @@ function checkConsulServers(service, tag, callback){
                     console.log(e);
                     console.log(body);
                 }
+                console.log("critical")
+                console.log(critical)
+                console.log("services")
+                console.log(services)
                 for (var i in critical){
                     if(critical[i].ServiceID){
     	                serversCritical.push(critical[i].ServiceID);
