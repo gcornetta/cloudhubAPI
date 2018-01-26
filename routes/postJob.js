@@ -25,12 +25,12 @@ function postJob (req, res) {
                     res.json({'err': 'Unsupported file format'})
                 } else {
                   checkConsulServers(job.machine, job.material, function (err, availableServers){
-                    if (err){
+                    /*if (err){
                         res.status(500);
                         res.json(err);
-                    }else{
-                        console.log("availableServers");
-                        console.log(availableServers);
+                    }else{*/
+                        //console.log("availableServers");
+                        //console.log(availableServers);
                         getNearestFabLab(req.db, job, availableServers, function(err, doc) {
                             if (err){
                                 res.status(500);
@@ -63,7 +63,7 @@ function postJob (req, res) {
                                 }
                             }
                         });
-                    }
+                    //}
                   })
                 }
               }else{
@@ -112,10 +112,6 @@ function checkConsulServers(service, tag, callback){
                     console.log(e);
                     console.log(body);
                 }
-                console.log("critical")
-                console.log(critical)
-                console.log("services")
-                console.log(services)
                 for (var i in critical){
                     if(critical[i].ServiceID){
     	                serversCritical.push(critical[i].ServiceID);
@@ -135,7 +131,7 @@ function checkConsulServers(service, tag, callback){
 
 function getNearestFabLab(db, job, serversUp, callback){
     db.collection('fablabs').find({
-        "_id": {$in: serversUp},
+        //"_id": {$in: serversUp},
         "equipment": { $elemMatch :{type: job.machine, status: {$nin: ["busy"]}}},
     	"location":
             { $near :
