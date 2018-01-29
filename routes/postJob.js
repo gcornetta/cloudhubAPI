@@ -14,6 +14,9 @@ function postJob (req, res) {
             form.parse(req, function(err, fields, files) {
               if (files && files.file){
                 job.file = files.file[0].path;
+                if (files.auxFile[0]){
+                    job.auxFile = files.auxFile[0].path;
+                }
                 var format;
                 if (job.machine === "3D printer"){
                     format = ".gcode";
@@ -25,10 +28,10 @@ function postJob (req, res) {
                     res.json({'err': 'Unsupported file format'})
                 } else {
                   checkConsulServers(job.machine, job.material, function (err, availableServers){
-                    if (err){
+                    /*if (err){
                         res.status(500);
                         res.json(err);
-                    }else{
+                    }else{*/
                         getNearestFabLab(req.db, job, availableServers, function(err, doc) {
                             if (err){
                                 res.status(500);
@@ -59,7 +62,7 @@ function postJob (req, res) {
                                 }
                             }
                         });
-                    }
+                    //}
                   })
                 }
               }else{
@@ -136,7 +139,7 @@ function checkConsulServers(service, tag, callback){
 
 function getNearestFabLab(db, job, serversUp, callback){
     db.collection('fablabs').find({
-        "_id": {$in: serversUp},
+        //"_id": {$in: serversUp},
         "equipment": { $elemMatch :{type: job.machine, status: {$nin: ["busy"]}}},
     	"location":
             { $near :
@@ -150,6 +153,9 @@ function getNearestFabLab(db, job, serversUp, callback){
 function sendJob(db, job, fablabs, fablabIndex, callback){
     var fablab = fablabs[fablabIndex];
     var formData = {file: fs.createReadStream(job.file)};
+    if (job.auxFile){
+        formData.auxFile = fs.createReadStream(job.auxFile);
+    }
     var queryString = JSON.parse(JSON.stringify(job));
     queryString.user = queryString.userId;
     delete queryString.userId;
