@@ -14,7 +14,7 @@ function postJob (req, res) {
             form.parse(req, function(err, fields, files) {
               if (files && files.file){
                 job.file = files.file[0].path;
-                if (files.auxFile[0]){
+                if ((files.auxFile)&&(files.auxFile[0])){
                     job.auxFile = files.auxFile[0].path;
                 }
                 var format;
@@ -182,6 +182,8 @@ function sendJob(db, job, fablabs, fablabIndex, callback){
                             if (err){
                                 callback(err);
                             }else{
+                                fs.unlink(job.file, function(err) {if (err) {console.log(err)}});
+                                fs.unlink(job.auxFile, function(err) {if (err) {console.log(err)}});
                                 db.collection('fablabs').updateOne(
                                     {"_id": fablab._id, "jobs.details.machineId": job.machineId},
                                     { $push: { "jobs.details.$.jobs": job }, $inc : {"jobs.queued": 1} },
