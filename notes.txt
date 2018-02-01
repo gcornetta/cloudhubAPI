@@ -23,6 +23,11 @@ CloudhubAPI
 - Crear una funcion lambda con el autorizador
 - Seleccionar la funcion lambda como autorizador en apiGateway
 
+- Flynn ws port
+flynn -a gcornetta-cloudhubapi-master release show --json
+flynn -a gcornetta-cloudhubapi-master release update update.json
+flynn route add tcp -s gcornetta-cloudhubapi-master-ws -p 3333
+
 - Flynn Indexes
 flynn -a gcornetta-cloudhubapi-master mongodb dump -f latest.dump
 mkdir dump
