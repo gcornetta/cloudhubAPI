@@ -164,7 +164,11 @@ function sendJob(db, job, fablabs, fablabIndex, callback){
     delete queryString.long;
     var req = request.post({url: 'http://'+fablab.api +':'+ fablab.port +'/fablab/jobs', qs: queryString, formData: formData}, function(err, res, body) {
             if (err){
-                callback (err);
+                if (fablabs[fablabIndex+1]){
+                    sendJob(db, job, fablabs, fablabIndex+1, callback);
+                }else{
+                    callback (err);
+                }
             }else {
                 try {
                     var parsedResponse = JSON.parse(body);
@@ -205,12 +209,20 @@ function sendJob(db, job, fablabs, fablabIndex, callback){
                                 }, 1000);
                             break;
                             default:
-                                callback(parsedResponse);
+                                if (fablabs[fablabIndex+1]){
+                                    sendJob(db, job, fablabs, fablabIndex+1, callback);
+                                }else{
+                                    callback(parsedResponse);
+                                }
                             break;
                         }
                     }
                 }else{
-                    callback(body);
+                    if (fablabs[fablabIndex+1]){
+                        sendJob(db, job, fablabs, fablabIndex+1, callback);
+                    }else{
+                        callback(body);
+                    }
                 }
             }
         });
