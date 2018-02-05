@@ -28,10 +28,10 @@ function postJob (req, res) {
                     res.json({'err': 'Unsupported file format'})
                 } else {
                   checkConsulServers(job.machine, job.material, function (err, availableServers){
-                    /*if (err){
+                    if (err){
                         res.status(500);
                         res.json(err);
-                    }else{*/
+                    }else{
                         getNearestFabLab(req.db, job, availableServers, function(err, doc) {
                             if (err){
                                 res.status(500);
@@ -62,7 +62,7 @@ function postJob (req, res) {
                                 }
                             }
                         });
-                    //}
+                    }
                   })
                 }
               }else{
@@ -92,12 +92,7 @@ function checkConsulServers(service, tag, callback){
     var url = process.env.CONSUL_ADDR +'/v1/catalog/service/'+service.toLowerCase()+tag;
     url = url.replace(" ","%20");
     request.get(url, function(err, res, body) {
-        console.log(url)
         url = process.env.CONSUL_ADDR +'/v1/catalog/service/'+service.toLowerCase()+tag;
-        url = url.replace(" ","$");
-        console.log(url)
-        console.log(err)
-        console.log(body)
         if (err){
             console.log(err);
             callback (err, resultArray);
@@ -108,38 +103,39 @@ function checkConsulServers(service, tag, callback){
             } catch (e) {
                 console.log(e);
                 console.log(body);
+                callback(body, resultArray)
+                callback = null;
             }
-            request.get(process.env.CONSUL_ADDR +'/v1/health/state/critical', function(err, res, body) {
-        console.log(process.env.CONSUL_ADDR +'/v1/health/state/critical')
-        console.log(err)
-        console.log(body)
-                var critical = {};
-                try {
-                    critical = JSON.parse(body);
-                } catch (e) {
-                    console.log(e);
-                    console.log(body);
-                }
-                for (var i in critical){
-                    if(critical[i].ServiceID){
-    	                serversCritical.push(critical[i].ServiceID);
-        	        }
-                }
-    	        for (var i in services){
-        	        if((services[i].ServiceID)&&(serversCritical.indexOf(services[i].ServiceID) === -1)){
-        	            services[i].ServiceID = require('mongodb').ObjectID(services[i].ServiceID.slice(0, services[i].ServiceID.indexOf("_")));
-    	                resultArray.push(services[i].ServiceID);
-        	        }
-    	        }
-                callback (err, resultArray);
-            });
+            if (callback){
+                request.get(process.env.CONSUL_ADDR +'/v1/health/state/critical', function(err, res, body) {
+                    var critical = {};
+                    try {
+                        critical = JSON.parse(body);
+                    } catch (e) {
+                        console.log(e);
+                        //console.log(body);
+                    }
+                    for (var i in critical){
+                        if(critical[i].ServiceID){
+                            serversCritical.push(critical[i].ServiceID);
+                        }
+                    }
+                    for (var i in services){
+                        if((services[i].ServiceID)&&(serversCritical.indexOf(services[i].ServiceID) === -1)){
+                            services[i].ServiceID = require('mongodb').ObjectID(services[i].ServiceID.slice(0, services[i].ServiceID.indexOf("_")));
+                            resultArray.push(services[i].ServiceID);
+                        }
+                    }
+                    callback (err, resultArray);
+                });
+            }
         }
     });
 }
 
 function getNearestFabLab(db, job, serversUp, callback){
     db.collection('fablabs').find({
-        //"_id": {$in: serversUp},
+        "_id": {$in: serversUp},
         "equipment": { $elemMatch :{type: job.machine, status: {$nin: ["busy"]}}},
     	"location":
             { $near :
