@@ -183,7 +183,9 @@ function sendJob(db, job, fablabs, fablabIndex, callback){
                                 callback(err);
                             }else{
                                 fs.unlink(job.file, function(err) {if (err) {console.log(err)}});
-                                fs.unlink(job.auxFile, function(err) {if (err) {console.log(err)}});
+                                if (job.auxFile){
+                                    fs.unlink(job.auxFile, function(err) {if (err) {console.log(err)}});
+                                }
                                 db.collection('fablabs').updateOne(
                                     {"_id": fablab._id, "jobs.details.machineId": job.machineId},
                                     { $push: { "jobs.details.$.jobs": job }, $inc : {"jobs.queued": 1} },
