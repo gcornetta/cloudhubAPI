@@ -62,6 +62,27 @@ function getAndUpdateFablabJobs(fablab){
                                 });
                             }
                         }
+                        var fablabObj = fablabWrapper.fablab;
+                        if (fablabObj.coordinates){
+                            fablabObj.jobs = fablabWrapper.jobs;
+                            fablabObj._id = require('mongodb').ObjectID(fablab._id);
+                            fablabObj.api = fablab.api;
+                            fablabObj.port = fablab.port;
+                            fablabObj.location = {
+                                'type': "Point",
+                                'coordinates': [parseFloat(fablabObj.coordinates.longitude), parseFloat(fablabObj.coordinates.latitude)]
+                            }
+                            delete fablabObj.coordinates.longitude;
+                            delete fablabObj.coordinates.latitude;
+                            delete fablabObj.coordinates;
+                            delete fablabObj.id;
+                            delete fablabObj._id;
+                            db.collection('fablabs').update({_id: require('mongodb').ObjectID(fablab._id)}, {$set:fablabObj}, function(err, docs) {
+                                if (err){
+                                    console.log(err);
+                                }
+                            });
+                        }
                     }
                 }
             });
