@@ -27,12 +27,13 @@ function postJob (req, res) {
                     res.status(400);
                     res.json({'err': 'Unsupported file format'})
                 } else {
-                  checkConsulServers(job.machine, job.material, function (err, availableServers){
+                  /*checkConsulServers(job.machine, job.material, function (err, availableServers){
                     if (err){
                         res.status(500);
                         res.json(err);
                     }else{
-                        getNearestFabLab(req.db, job, availableServers, function(err, doc) {
+                        getNearestFabLab(req.db, job, availableServers, function(err, doc) {*/
+                        getNearestFabLab(req.db, job, [], function(err, doc) {
                             if (err){
                                 res.status(500);
                                 res.json(err);
@@ -62,8 +63,8 @@ function postJob (req, res) {
                                 }
                             }
                         });
-                    }
-                  })
+                    /*}
+                  })*/
                 }
               }else{
                 res.status(400);
@@ -135,7 +136,7 @@ function checkConsulServers(service, tag, callback){
 
 function getNearestFabLab(db, job, serversUp, callback){
     db.collection('fablabs').find({
-        "_id": {$in: serversUp},
+        //"_id": {$in: serversUp},
         "equipment": { $elemMatch :{type: job.machine, status: {$nin: ["busy"]}}},
     	"location":
             { $near :
