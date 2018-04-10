@@ -17,7 +17,9 @@ function refreshJobs(){
 }
 
 function updateJobStatus(jobId, status, callback){
-    db.collection('jobs').updateOne({id: jobId}, {$set:{"status": status}}, callback);
+    db.collection('jobs').updateOne({id: jobId}, {$set:{"status": status}}, function (err, res){
+        callback(err, res, jobId);
+    });
 }
 
 function deleteJob(jobId, callback){
@@ -54,10 +56,9 @@ function getAndUpdateFablabJobs(fablab){
                         var jobs = fablabWrapper.jobs.details;
                         for (var fab in jobs){
                             for (var j in jobs[fab].jobs){
-                                //console.log(jobs[fab].jobs[j]);
-                                updateJobStatus(jobs[fab].jobs[j].id, jobs[fab].jobs[j].status, function (err, res){
+                                updateJobStatus(jobs[fab].jobs[j].id, jobs[fab].jobs[j].status, function (err, res, id){
                                     if (res.result.n === 0){
-                                        getAndInsertJob(fablab, jobs[fab].jobs[j].id);
+                                        getAndInsertJob(fablab, id);
                                     }
                                 });
                             }
