@@ -1,7 +1,7 @@
 CloudhubAPI
 
 - MongoDB
-- Añadir indice para busquedas geoespaciales: db.fablabs.createIndex({location: ‘2dsphere’})
+- Añadir indice para busquedas geoespaciales: db.fablabs.createIndex({location: '2dsphere'})
 
 
 - Auth0
@@ -22,5 +22,31 @@ CloudhubAPI
 - Crear un rol IAM con permisos para lambda
 - Crear una funcion lambda con el autorizador
 - Seleccionar la funcion lambda como autorizador en apiGateway
+
+- Flynn ws port
+flynn -a gcornetta-cloudhubapi-master release show --json
+flynn -a gcornetta-cloudhubapi-master release update update.json
+flynn route add tcp -s gcornetta-cloudhubapi-master-ws -p 3333
+
+- Flynn Indexes
+flynn -a gcornetta-cloudhubapi-master mongodb dump -f latest.dump
+mkdir dump
+tar -xf latest.dump
+mv 749a104d0c0b0f67c89ea77fa966b78c/ dump/
+mongoresotre
+mongo
+use 749a104d0c0b0f67c89ea77fa966b78c
+db.fablabs.createIndex({location: '2dsphere'})
+db.fablabs.getIndexes()
+^C
+rm latest.dump
+rm -r dump/
+mongodump
+cd dump
+delete all dbs in dump except 749a104d0c0b0f67c89ea77fa966b78c
+tar -cf ../mydb.dump .
+cd ..
+flynn -a gcornetta-cloudhubapi-master mongodb restore -f mydb.dump
+
 
 

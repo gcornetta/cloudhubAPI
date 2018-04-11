@@ -14,6 +14,9 @@ function postJob (req, res) {
             form.parse(req, function(err, fields, files) {
               if (files && files.file){
                 job.file = files.file[0].path;
+                if ((files.auxFile)&&(files.auxFile[0])){
+                    job.auxFile = files.auxFile[0].path;
+                }
                 var format;
                 if (job.machine === "3D printer"){
                     format = ".gcode";
@@ -24,20 +27,17 @@ function postJob (req, res) {
                     res.status(400);
                     res.json({'err': 'Unsupported file format'})
                 } else {
-                  checkConsulServers(job.machine, job.material, function (err, availableServers){
-                    /*if (err){
+                  /*checkConsulServers(job.machine, job.material, function (err, availableServers){
+                    if (err){
                         res.status(500);
                         res.json(err);
-                    }else{*/
-                        //console.log("availableServers");
-                        //console.log(availableServers);
-                        getNearestFabLab(req.db, job, availableServers, function(err, doc) {
+                    }else{
+                        getNearestFabLab(req.db, job, availableServers, function(err, doc) {*/
+                        getNearestFabLab(req.db, job, [], function(err, doc) {
                             if (err){
                                 res.status(500);
                                 res.json(err);
                             }else{
-                                console.log("doc")
-                                console.log(doc)
                                 if (doc[0]){
                                     if (req.get("Authentication")){
                                         job.userId = req.get("newtonUser") || getUserId(req.get("Authentication"));
@@ -63,8 +63,8 @@ function postJob (req, res) {
                                 }
                             }
                         });
-                    //}
-                  })
+                    /*}
+                  })*/
                 }
               }else{
                 res.status(400);
@@ -93,6 +93,7 @@ function checkConsulServers(service, tag, callback){
     var url = process.env.CONSUL_ADDR +'/v1/catalog/service/'+service.toLowerCase()+tag;
     url = url.replace(" ","%20");
     request.get(url, function(err, res, body) {
+        url = process.env.CONSUL_ADDR +'/v1/catalog/service/'+service.toLowerCase()+tag;
         if (err){
             console.log(err);
             callback (err, resultArray);
@@ -103,28 +104,32 @@ function checkConsulServers(service, tag, callback){
             } catch (e) {
                 console.log(e);
                 console.log(body);
+                callback(body, resultArray)
+                callback = null;
             }
-            request.get(process.env.CONSUL_ADDR +'/v1/health/state/critical', function(err, res, body) {
-                var critical = {};
-                try {
-                    critical = JSON.parse(body);
-                } catch (e) {
-                    console.log(e);
-                    console.log(body);
-                }
-                for (var i in critical){
-                    if(critical[i].ServiceID){
-    	                serversCritical.push(critical[i].ServiceID);
-        	        }
-                }
-    	        for (var i in services){
-        	        if((services[i].ServiceID)&&(serversCritical.indexOf(services[i].ServiceID) === -1)){
-        	            services[i].ServiceID = require('mongodb').ObjectID(services[i].ServiceID.slice(0, services[i].ServiceID.indexOf("_")));
-    	                resultArray.push(services[i].ServiceID);
-        	        }
-    	        }
-                callback (err, resultArray);
-            });
+            if (callback){
+                request.get(process.env.CONSUL_ADDR +'/v1/health/state/critical', function(err, res, body) {
+                    var critical = {};
+                    try {
+                        critical = JSON.parse(body);
+                    } catch (e) {
+                        console.log(e);
+                        //console.log(body);
+                    }
+                    for (var i in critical){
+                        if(critical[i].ServiceID){
+                            serversCritical.push(critical[i].ServiceID);
+                        }
+                    }
+                    for (var i in services){
+                        if((services[i].ServiceID)&&(serversCritical.indexOf(services[i].ServiceID) === -1)){
+                            services[i].ServiceID = require('mongodb').ObjectID(services[i].ServiceID.slice(0, services[i].ServiceID.indexOf("_")));
+                            resultArray.push(services[i].ServiceID);
+                        }
+                    }
+                    callback (err, resultArray);
+                });
+            }
         }
     });
 }
@@ -145,6 +150,9 @@ function getNearestFabLab(db, job, serversUp, callback){
 function sendJob(db, job, fablabs, fablabIndex, callback){
     var fablab = fablabs[fablabIndex];
     var formData = {file: fs.createReadStream(job.file)};
+    if (job.auxFile){
+        formData.auxFile = fs.createReadStream(job.auxFile);
+    }
     var queryString = JSON.parse(JSON.stringify(job));
     queryString.user = queryString.userId;
     delete queryString.userId;
@@ -153,7 +161,11 @@ function sendJob(db, job, fablabs, fablabIndex, callback){
     delete queryString.long;
     var req = request.post({url: 'http://'+fablab.api +':'+ fablab.port +'/fablab/jobs', qs: queryString, formData: formData}, function(err, res, body) {
             if (err){
-                callback (err);
+                if (fablabs[fablabIndex+1]){
+                    sendJob(db, job, fablabs, fablabIndex+1, callback);
+                }else{
+                    callback (err);
+                }
             }else {
                 try {
                     var parsedResponse = JSON.parse(body);
@@ -171,6 +183,10 @@ function sendJob(db, job, fablabs, fablabIndex, callback){
                             if (err){
                                 callback(err);
                             }else{
+                                fs.unlink(job.file, function(err) {if (err) {console.log(err)}});
+                                if (job.auxFile){
+                                    fs.unlink(job.auxFile, function(err) {if (err) {console.log(err)}});
+                                }
                                 db.collection('fablabs').updateOne(
                                     {"_id": fablab._id, "jobs.details.machineId": job.machineId},
                                     { $push: { "jobs.details.$.jobs": job }, $inc : {"jobs.queued": 1} },
@@ -192,12 +208,20 @@ function sendJob(db, job, fablabs, fablabIndex, callback){
                                 }, 1000);
                             break;
                             default:
-                                callback(parsedResponse);
+                                if (fablabs[fablabIndex+1]){
+                                    sendJob(db, job, fablabs, fablabIndex+1, callback);
+                                }else{
+                                    callback(parsedResponse);
+                                }
                             break;
                         }
                     }
                 }else{
-                    callback(body);
+                    if (fablabs[fablabIndex+1]){
+                        sendJob(db, job, fablabs, fablabIndex+1, callback);
+                    }else{
+                        callback(body);
+                    }
                 }
             }
         });

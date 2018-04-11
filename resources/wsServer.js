@@ -17,63 +17,67 @@ wss.on('connection', function connection(ws) {
         }else if (!fablab){
             ws.send(JSON.stringify({err: "Fablab not found"}));
         }else{
-            switch (msg.event){
-                case "serviceUp": //(fablabId, machineId)
-                    console.log("serviceUp");
-                    var auxMaterials = [];
-                    for (var mat in fablab.materials){
-                        auxMaterials.push(fablab.materials[mat].type);
-                    }
-                    registerConsulServices(fablab, fablab.equipment, auxMaterials, function(err){
-                        if (err){
-                            ws.send(JSON.stringify(err));
-                        }else{
-                           ws.send(JSON.stringify({msg: "Service added successfully"}));
-                        }
-                    });
-                break;
-                case "serviceDown": //(fablabId, machineId)
-                    console.log("serviceDown");
-                    for (var machine in fablab.equipment){
-                        if (fablab.equipment[machine].id == msg.machineId){
-                            deregisterServices(fablab, [fablab.equipment[machine]], function(err){
+            checkToken.checkTokenWS(msg.token, function(authorized, payload){
+                if (authorized){
+                    switch (msg.event){
+                        case "serviceUp": //(fablabId, machineId)
+                            console.log("serviceUp");
+                            var auxMaterials = [];
+                            for (var mat in fablab.materials){
+                                auxMaterials.push(fablab.materials[mat].type);
+                            }
+                            registerConsulServices(fablab, fablab.equipment, auxMaterials, function(err){
                                 if (err){
                                     ws.send(JSON.stringify(err));
                                 }else{
-                                    ws.send(JSON.stringify({msg: "Service deleted successfully"}));
+                                   ws.send(JSON.stringify({msg: "Service added successfully"}));
                                 }
                             });
-                            break;
-                        }
+                        break;
+                        case "serviceDown": //(fablabId, machineId)
+                            console.log("serviceDown");
+                            for (var machine in fablab.equipment){
+                                if (fablab.equipment[machine].id == msg.machineId){
+                                    deregisterServices(fablab, [fablab.equipment[machine]], function(err){
+                                        if (err){
+                                            ws.send(JSON.stringify(err));
+                                        }else{
+                                            ws.send(JSON.stringify({msg: "Service deleted successfully"}));
+                                        }
+                                    });
+                                    break;
+                                }
+                            }
+                        break;
+                        case "fabLabDown": //(fablabId)
+                            console.log("fablabDown");
+                            deregisterServices(fablab, fablab.equipment, function(err){
+                                if (err){
+                                    ws.send(JSON.stringify(err));
+                                }else{
+                                   ws.send(JSON.stringify({msg: "Services deleted successfully"}));
+                                }
+                            });
+                        break;
+                        case "machineStateChange": //(fablabId, machineId, status)
+                            console.log("machineStateChange");
+                            for (var machine in fablab.equipment){
+                                if (fablab.equipment[machine].id == msg.machineId){
+                                    fablab.equipment[machine].status = msg.status;
+                                    break;
+                                }
+                            }
+                            db.collection('fablabs').save(fablab, {"upsert":true}, function(err, docs) {
+                                if (err){
+                                    ws.send(JSON.stringify(err));
+                                }else{
+                                   ws.send(JSON.stringify({msg: "Status updated"}));
+                                }
+                            });
+                        break;
                     }
-                break;
-                case "fabLabDown": //(fablabId)
-                    console.log("fablabDown");
-                    deregisterServices(fablab, fablab.equipment, function(err){
-                        if (err){
-                            ws.send(JSON.stringify(err));
-                        }else{
-                           ws.send(JSON.stringify({msg: "Services deleted successfully"}));
-                        }
-                    });
-                break;
-                case "machineStateChange": //(fablabId, machineId, status)
-                    console.log("machineStateChange");
-                    for (var machine in fablab.equipment){
-                        if (fablab.equipment[machine].id == msg.machineId){
-                            fablab.equipment[machine].status = msg.status;
-                            break;
-                        }
-                    }
-                    db.collection('fablabs').save(fablab, {"upsert":true}, function(err, docs) {
-                        if (err){
-                            ws.send(JSON.stringify(err));
-                        }else{
-                           ws.send(JSON.stringify({msg: "Status updated"}));
-                        }
-                    });
-                break;
-            }
+                }
+            })
         }
     });
   });
@@ -82,7 +86,7 @@ wss.on('connection', function connection(ws) {
 function deregisterServices(fablab, machines, callback){
     var nextMachine = machines.pop();
     if (nextMachine){
-        deregisterConsulService(fablab, {machine: nextMachine.type}, function(err, body){
+        deregisterConsulService(fablab, {machine: nextMachine.type}, 10, function(err, body){
             if (err){
                 callback(err);
             }else{
@@ -94,14 +98,18 @@ function deregisterServices(fablab, machines, callback){
     }
 }
 
-function deregisterConsulService(fablab, service, callback){
-    request.post({
+function deregisterConsulService(fablab, service, retries, callback){
+    request({
         method: 'PUT',
         uri: process.env.CONSUL_ADDR +'/v1/agent/service/deregister/'+fablab._id + "_" + service.machine.toLowerCase()
     }, function(err, res, body) {
-                    if (!body){
-                        body = {};
+                    if ((body || err)&&(retries > 0)){
+                        deregisterConsulService(fablab, service, retries-1, callback)
+                    }else{
+                        if (body && (!err)){
+                            err = body;
+                        }
+                        callback (err, body);
                     }
-                    callback (err, body);
                 });
 }

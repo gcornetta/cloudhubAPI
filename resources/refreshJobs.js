@@ -17,7 +17,9 @@ function refreshJobs(){
 }
 
 function updateJobStatus(jobId, status, callback){
-    db.collection('jobs').updateOne({id: jobId}, {$set:{"status": status}}, callback);
+    db.collection('jobs').updateOne({id: jobId}, {$set:{"status": status}}, function (err, res){
+        callback(err, res, jobId);
+    });
 }
 
 function deleteJob(jobId, callback){
@@ -54,13 +56,33 @@ function getAndUpdateFablabJobs(fablab){
                         var jobs = fablabWrapper.jobs.details;
                         for (var fab in jobs){
                             for (var j in jobs[fab].jobs){
-                                //console.log(jobs[fab].jobs[j]);
-                                updateJobStatus(jobs[fab].jobs[j].id, jobs[fab].jobs[j].status, function (err, res){
+                                updateJobStatus(jobs[fab].jobs[j].id, jobs[fab].jobs[j].status, function (err, res, id){
                                     if (res.result.n === 0){
-                                        getAndInsertJob(fablab, jobs[fab].jobs[j].id);
+                                        getAndInsertJob(fablab, id);
                                     }
                                 });
                             }
+                        }
+                        var fablabObj = fablabWrapper.fablab;
+                        if (fablabObj.coordinates){
+                            fablabObj.jobs = fablabWrapper.jobs;
+                            fablabObj._id = require('mongodb').ObjectID(fablab._id);
+                            fablabObj.api = fablab.api;
+                            fablabObj.port = fablab.port;
+                            fablabObj.location = {
+                                'type': "Point",
+                                'coordinates': [parseFloat(fablabObj.coordinates.longitude), parseFloat(fablabObj.coordinates.latitude)]
+                            }
+                            delete fablabObj.coordinates.longitude;
+                            delete fablabObj.coordinates.latitude;
+                            delete fablabObj.coordinates;
+                            delete fablabObj.id;
+                            delete fablabObj._id;
+                            db.collection('fablabs').update({_id: require('mongodb').ObjectID(fablab._id)}, {$set:fablabObj}, function(err, docs) {
+                                if (err){
+                                    console.log(err);
+                                }
+                            });
                         }
                     }
                 }

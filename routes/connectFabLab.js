@@ -35,8 +35,6 @@ function connectFabLab (req, res) {
                                                     res.status(500);
                                                     res.json(err);
                                                 }else{
-                                                    console.log(fablab._id)
-                                                    console.log(incompleteFablab._id)
                                                     delete fablab._id;
                                                     req.db.collection('fablabs').update({_id: require('mongodb').ObjectID(incompleteFablab._id)}, {$set:fablab}, function(err, docs) {
                                                         if (err){
@@ -110,7 +108,7 @@ function getFablabInfo(fablab, callback){
 function registerServices(fablab, machines, materials, callback){
     var nextMachine = machines.pop();
     if (nextMachine){
-        addConsulService(fablab, {machine: nextMachine.type, material: materials}, function(err, body){
+        addConsulService(fablab, {machine: nextMachine.type, material: materials}, 10, function(err, body){
             if (err){
                 callback(err);
             }else{
@@ -122,7 +120,7 @@ function registerServices(fablab, machines, materials, callback){
     }
 }
 
-function addConsulService(fablab, service, callback){
+function addConsulService(fablab, service, retries, callback){
     if (service.material){
         for (var m in service.material){
             service.material[m] = service.material[m].toLowerCase();
@@ -130,8 +128,7 @@ function addConsulService(fablab, service, callback){
     }else{
         service.material = [];
     }
-    console.log("add consul service: "+ fablab._id + "_" + service.machine.toLowerCase())
-    request.post({
+    request({
         method: 'PUT',
         uri: process.env.CONSUL_ADDR +'/v1/agent/service/register',
         json: {
@@ -148,10 +145,14 @@ function addConsulService(fablab, service, callback){
                  }
               }
     }, function(err, res, body) {
-                    if (!body){
-                        body = {};
+                    if ((body || err)&&(retries > 0)){
+                        addConsulService(fablab, service, retries-1, callback);
+                    }else{
+                        if (body && (!err)){
+                            err = body;
+                        }
+                        callback (err, body);
                     }
-                    callback (err, body);
                 });
 }
 

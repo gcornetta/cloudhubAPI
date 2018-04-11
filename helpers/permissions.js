@@ -153,6 +153,43 @@ module.exports.checkTokenUser = function(token, userId, callback){
     }
 }
 
+module.exports.checkTokenWS = function(token, callback){
+    if (token){
+        token = validToken(token);
+        try {
+            var decoded = jwt.decode(token);
+        } catch (e) {
+            console.log(e);
+        }
+        if (decoded){
+            if (!jwks){
+                getJWKS(function(err, jwksRet){
+                    if (err){
+                        callback(false);
+                    }else{
+                        jwks = jwksRet;
+                        if (jws.verify(token, jwks.keys[0], {algorithms: 'RS256'})) {
+                            callback(true, decoded);
+                        }else{
+                            callback(false);
+                        }
+                    }
+                })
+            }else{
+                    if (jws.verify(token, jwks.keys[0], {algorithms: 'RS256'})) {
+                        callback(true, decoded);
+                    }else{
+                        callback(false);
+                    }
+            }
+        }else{
+            callback(false);
+        }
+    }else{
+        callback(false);
+    }
+}
+
 module.exports.getUserId = function(token){
     token = validToken(token);
     var decoded = jwt.decode(token);
