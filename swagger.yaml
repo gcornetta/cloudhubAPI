@@ -146,7 +146,11 @@ paths:
       consumes:
         - multipart/form-data
       parameters:
-        - $ref: '#/parameters/file'
+        - name: file
+          in: formData
+          required: true
+          type: file
+          description: The file with the design submitted for fabrication. Format .gcode for 3d print and .png for the rest
         - $ref: '#/parameters/machine'
         - $ref: '#/parameters/lat'
         - $ref: '#/parameters/long'
@@ -299,12 +303,6 @@ parameters:
       enum:
         - rough_cut
         - finish_cut
-  file:
-      name: file
-      in: formData
-      required: true
-      type: file
-      description: The file with the design submitted for fabrication. Format .gcode for 3d print and .png for the rest
   lat:
     name: lat
     in: query
