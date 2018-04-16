@@ -53,7 +53,7 @@ app.use(function (req, res, next) {
 
 // all environments
 app.set('port', process.env.PORT || 3000);
-app.use(morgan('dev'));
+//app.use(morgan('dev'));
 app.use(bodyParser());
 app.use(methodOverride());
 app.use(express.static(path.join(__dirname, 'public')));
