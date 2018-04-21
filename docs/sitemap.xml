@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+  xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  
+  <url>
+    <loc>http://your.base.url/post/201804201115/</loc>
+    <lastmod>2018-04-20T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://your.base.url/post/201804201120/</loc>
+    <lastmod>2018-04-20T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://your.base.url/post/201804201130/</loc>
+    <lastmod>2018-04-20T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://your.base.url/project/cloudapis/</loc>
+    <lastmod>2015-10-05T02:27:08+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://your.base.url/project/fablabgateway/</loc>
+    <lastmod>2015-09-27T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://your.base.url/project/machinewrapper/</loc>
+    <lastmod>2015-09-27T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://your.base.url/about/</loc>
+    <lastmod>2015-08-18T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://your.base.url/categories/about/</loc>
+    <lastmod>2015-08-18T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://your.base.url/tags/bio/</loc>
+    <lastmod>2015-08-18T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://your.base.url/categories/bio/</loc>
+    <lastmod>2015-08-18T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://your.base.url/categories/</loc>
+    <lastmod>2015-08-18T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://your.base.url/tags/cloud/</loc>
+    <lastmod>2018-04-20T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://your.base.url/tags/meta/</loc>
+    <lastmod>2018-04-20T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://your.base.url/categories/meta/</loc>
+    <lastmod>2015-08-18T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://your.base.url/</loc>
+    <lastmod>2018-04-20T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://your.base.url/tags/newton/</loc>
+    <lastmod>2018-04-20T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://your.base.url/categories/post/</loc>
+    <lastmod>2018-04-20T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://your.base.url/post/</loc>
+    <lastmod>2018-04-20T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://your.base.url/tags/project/</loc>
+    <lastmod>2015-10-05T02:27:08+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://your.base.url/categories/project/</loc>
+    <lastmod>2015-10-05T02:27:08+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://your.base.url/project/</loc>
+    <lastmod>2015-10-05T02:27:08+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://your.base.url/tags/</loc>
+    <lastmod>2015-08-18T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://your.base.url/tags/test/</loc>
+    <lastmod>2018-04-20T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+</urlset>
