@@ -76,14 +76,60 @@
                         <div class="section-spacer"></div>
                     </div>
                     <div class="hmdl-page-content mdl-color-text--grey-700 mdl-card__supporting-text">
-                        <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry. 
-Lorem Ipsum has been the industry&rsquo;s standard dummy text ever since the 1500s,
-when an unknown printer took a galley of type and scrambled it to make a type
-specimen book. It has survived not only five centuries, but also the leap into
-electronic typesetting, remaining essentially unchanged. It was popularised in
-the 1960s with the release of Letraset sheets containing Lorem Ipsum passages,
-and more recently with desktop publishing software like Aldus PageMaker
-including versions of Lorem Ipsum.</p>
+                        <p align="justify">
+<strong>NEWTON</strong> fab lab architecture is a distributed and loosely coupled hardware/software infrastructure that allows remote access to digital fabrication resources as well as fab lab networking and communication.
+</p>
+
+<p>The hardware infrastructure has the following characteristics:</p>
+
+<ol>
+<li><p>cheap;</p></li>
+
+<li><p>easily deployable maintainable and scalable;</p></li>
+
+<li><p>vendor agnostic.</p></li>
+</ol>
+
+<p>The software infrastructure has the following characteristics:</p>
+
+<ol>
+<li><p>modular and hardware-agnostic;</p></li>
+
+<li><p>easily integrable with third-party services and applications through REST APIs;</p></li>
+
+<li><p>easily deployable in both private and public clouds;</p></li>
+
+<li><p>robust and secure;</p></li>
+
+<li><p>developer-friendly.</p></li>
+</ol>
+
+<p><img src="https://gcornetta.github.io/cloudhubAPI/images/fablabArch.png" alt="NEWTON Fab Lab Architecture" />
+<em>Fig. 1: NEWTON Fab Lab Architecture</em></p>
+
+<p align="justify">
+Fig. 1 depicts the overall system architecture. It is a distributed three-tier architecture in which we can clearly identify three layers:
+</p>
+
+<ol>
+<li><p align="justify"><strong>The service layer</strong>; namely, the software abstraction layer that wraps the fab lab infrastructure and exposes it a service to the internet through a set of APIs.</p></li>
+
+<li><p align="justify"><strong>The middleware layer</strong>; namely, the cloud hub infrastructure that manages intra-fab lab communications and provides the software interfaces to connect to third-party services and applications.</p></li>
+
+<li><p align="justify"><strong>The application layer</strong>; namely, a third-party application that connects to the cloud infrastructure using a REST client.</p></li>
+</ol>
+
+<p align="justify">
+The interfacing between layers is implemented through REST (Representational State Transfer) Application Programming Interfaces (APIs) that guarantee seamless interoperation between different technologies and provide programmers with a framework to expand NEWTON platform by developing new applications on top of the API layer or adding new layers to the protocol stack.
+</p>
+
+<p align="justify">
+In NEWTON fab lab production environment, the fab lab gateways are connected to the cloud infrastructure through a IPSec tunnel; however, if you don't want to set up a complex infrastructure you can leverage the gateway infrastructure to create a secure TLS connection with the cloud infrastructure.
+<p>
+
+<p align="justify">
+The fab lab gateway is simply a set of microservices whose API endpoints are protected using an API gateway. We use <a href="https://www.express-gateway.io">Express Gateway</a> as the API gateway. <strong>Express Gateway</strong> is a lightweight, flexible and easy-to-configure gateway based on <strong>Express.js</strong> framework. With Express Gateway, setting up a TLS socket is as simple as editing a YAML configuration file.
+</p>
                     </div>
                     <div class="hmdl-page-comments mdl-color-text--primary-contrast mdl-card__supporting-text comments"> 
                         <a href=http://example.com/>Gianluca Cornetta</a>
