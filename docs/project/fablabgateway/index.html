@@ -68,9 +68,10 @@
                         <h3 >Fab Lab Gateway</h3>
                     </div>
                     <div class="hmdl-page-meta mdl-color-text--grey-700 mdl-card__supporting-text">
+                        <div class="minilogo" style="background-image: url('https://gcornetta.github.io/cloudhubAPI/images/avatar-64x64.png');"></div>
                         <div>
-                            <strong>First Last</strong>
-                            <span>Sep 27, 2015</span>
+                            <strong>Gianluca Cornetta</strong>
+                            <span>Apr 25, 2018</span>
                         </div>
                         <div class="section-spacer"></div>
                         <div><span>
@@ -82,35 +83,46 @@
                     </div>
                         
                     <div class="hmdl-page-content mdl-color-text--grey-700 mdl-card__supporting-text">
-                        <p>Mustache keytar disrupt ugh PBR. Before they sold out Brooklyn pickled, lumbersexual lo-fi mustache hoodie Tumblr Banksy semiotics salvia seitan 8-bit four loko PBR. Readymade mumblecore selfies, forage Schlitz Truffaut Portland PBR&amp;B brunch sustainable chia retro 90&rsquo;s tofu actually. Cold-pressed synth pickled Blue Bottle, chambray photo booth Schlitz Austin leggings distillery. Whatever kogi gastropub hashtag, 90&rsquo;s wayfarers church-key ennui chia actually. Disrupt Bushwick trust fund, bicycle rights umami pork belly sartorial lumbersexual scenester asymmetrical Schlitz. Ugh whatever raw denim taxidermy paleo Kickstarter polaroid, Austin before they sold out iPhone readymade mlkshk mixtape.</p>
+                        <p align="justify">
+The fab lab gateway is the entry point of a NEWTON fab lab. It implements the access and security policies and exposes a set of APIs that exposes the fab lab over the internet as a web service. The APIs allow an external authorized user or application to perform several operations on the machines of a fab lab, such as: sending a fabrication request, check a machine status, check the fabrication progress, and cancel a fabrication request.
+</p>
 
-<p>Vegan tote bag flannel, master cleanse American Apparel drinking vinegar banh mi. Cornhole small batch polaroid, Intelligentsia occupy cliche wolf brunch. Brooklyn before they sold out health goth, Banksy fingerstache cray bitters post-ironic lumbersexual. Fixie lo-fi Carles, chambray 8-bit cold-pressed typewriter Echo Park cronut PBR&amp;B polaroid Neutra. Helvetica DIY blog, distillery typewriter VHS High Life listicle. Typewriter aesthetic YOLO brunch literally meh. Twee organic Austin, street art chia jean shorts before they sold out.</p>
+<p align="justify">
+The fab lab gateway runs on a <strong>Raspberry Pi III model B embedded computer</strong>. Raspberry Pi III model B has ARM Cortex-A53 quad-core processor implementing the ARMv7 32-bit microarchitecture. Recently, Raspberry Pi foundation has launched to the market the <strong>Raspberry Pi III model B+</strong> that implements the 64-bit ARMv8 microarchitecture. <strong>We have not yet tested our software with this new model, so we cannot guarantee a correct operation with the new B+ model</strong>.   
+</p>
 
-<p>Echo Park fanny pack small batch, Austin kale chips four dollar toast tattooed crucifix flexitarian PBR. Gentrify taxidermy health goth wolf, kale chips four dollar toast messenger bag kogi flannel mustache. Four loko selfies cray, meditation Marfa mumblecore tote bag butcher photo booth. Roof party twee retro hoodie, pork belly put a bird on it Austin taxidermy. Meh quinoa Brooklyn sustainable sartorial. Church-key mustache Blue Bottle Shoreditch XOXO artisan. Mixtape hoodie +1, ethical letterpress chambray authentic skateboard.</p>
+<p align="justify">
+The fab lab gateway, that we also call <strong>Pi Gateway</strong> is formed by three components:
+</p>
 
-<p>Schlitz small batch four dollar toast, Etsy dreamcatcher roof party irony. Single-origin coffee slow-carb selvage occupy, art party vegan photo booth chambray. Organic whatever Pitchfork, food truck XOXO listicle shabby chic pug migas VHS American Apparel YOLO crucifix kale chips cardigan. Polaroid sustainable church-key, tattooed Blue Bottle ennui tote bag blog umami cray asymmetrical American Apparel pork belly ethical chambray. Meditation skateboard fashion axe Odd Future yr Kickstarter cardigan. Post-ironic Godard meh beard +1, leggings biodiesel cornhole drinking vinegar keytar plaid sartorial migas viral gentrify. Sriracha lumbersexual sustainable, sartorial occupy keytar brunch artisan hella tattooed gluten-free.</p>
+<ol>
+<li><p align="justify"><strong>The API Gateway</strong> (i.e. and instance of <a href="https://www.express-gateway.io">Express Gateway</a>), that acts like a proxy that manages the incoming requests from the cloud hub, implements security and access policies and forward the requests to the API Wrapper Microservice.
+</p></li>
+
+<li><p align="justify"><strong>The API Wrapper Microservice</strong>, that implements the gateway business logic, manages the API quota and implements the communication protocols with the digital fabrication machines.
+</p></li>
+
+<li><p align="justify"><strong>The Command Line Interface</strong> (CLI), that implements a set of methods to download, install, deploy, monitor and manage the fab lab gateway.
+</p></li>
+</ol>
+
+<p>Please observe that the CLI software has not been open-sourced.</p>
 
                     </div>
                     
                     <div class="hmdl-page-comments mdl-color-text--primary-contrast mdl-card__supporting-text comments"> 
-                        <a href="http://example.com/bio/">First Last</a>
+                        <a href="http://example.com/bio/">Gianluca Cornetta</a>
                         <p>Writer of stuff</p>
                     </div>  
                 </div>                
                 <nav class="mdl-color-text--grey-50 mdl-cell mdl-cell--12-col">
-                    <a href="/cloudhubAPI/project/machinewrapper/">
+                    <a href="/cloudhubAPI/project/cloudapis/">
                         <button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon mdl-color--white mdl-color-text--grey-900" role="presentation">
                         <i class="icon ion-android-arrow-back"></i>
                         </button>
                         Older
                     </a>
                     <div class="section-spacer"></div>
-                    <a href="/cloudhubAPI/project/cloudapis/">
-                        Newer
-                        <button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon mdl-color--white mdl-color-text--grey-900" role="presentation">
-                            <i class="icon ion-android-arrow-forward"></i>
-                        </button>
-                    </a>
                 </nav>
  
             </div>        
