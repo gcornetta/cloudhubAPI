@@ -77,7 +77,7 @@
                     </div>
                     <div class="hmdl-page-content mdl-color-text--grey-700 mdl-card__supporting-text">
                         <p align="justify">
-The cloud hub runs a connector software that wraps all the available services end exposes them to the internet through a set of APIs. In our original design, the API endpoints were protected using <strong>Auth0</strong> as the authentication server and <strong>AWS API Gateway</strong> to proxy the incoming requests to the backend APIs.  However, when we decided to open source the fab lab connector we chose to detach it from AWS managed services in order to give the users the possibility to deploy the fab lab hub on their favourite private or public cloud without any limitation imposed by third-party external services.
+The cloud hub runs a connector software that wraps all the available services and exposes them to the internet through a set of APIs. In our original design, the API endpoints were protected using <strong>Auth0</strong> as the authentication server and <strong>AWS API Gateway</strong> to proxy the incoming requests to the backend APIs.  However, when we decided to open source the fab lab connector we chose to detach it from AWS managed services in order to give the users the possibility to deploy the fab lab hub on their favourite private or public cloud without any limitation imposed by third-party external services.
 </p>
 
 <p align="justify">
@@ -85,8 +85,9 @@ Thus in the final implementation the <strong>Express.js</strong> middleware that
 our middleware, which makes API Gateway unnecessary.
 </p>
 
-<p><img src="https://gcornetta.github.io/cloudhubAPI/images/fablabConn.png" alt="NEWTON Fab Lab Connector" />
-<em>Fig. 1: Architecture of the Fab Lab Connector Module</em></p>
+<p><img src="https://gcornetta.github.io/cloudhubAPI/images/fablabConn.png" alt="NEWTON Fab Lab Connector" /></p>
+
+<p><em>Fig. 1: Detailed Architecture of the Fab Lab Connector Module</em></p>
 
 <h3 id="fab-lab-connector">Fab Lab Connector</h3>
 
