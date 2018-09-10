@@ -67,6 +67,8 @@ function postJob (req, res) {
                }) */
             }
           } else {
+            console.log(err)
+            console.log(files)
             res.status(400)
             res.json({'err': 'Missing attachment'})
           }
