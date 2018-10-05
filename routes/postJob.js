@@ -67,8 +67,10 @@ function postJob (req, res) {
                }) */
             }
           } else {
+            console.log('else (!err && files && files.file)')
             console.log(err)
             console.log(files)
+            console.log('----------------------------------')
             res.status(400)
             res.json({'err': 'Missing attachment'})
           }
@@ -172,8 +174,10 @@ function sendJob (db, job, fablabs, fablabIndex, callback) {
       try {
         var parsedResponse = JSON.parse(body)
       } catch (e) {
+        console.log('request.post error')
         console.log(e)
         console.log(body)
+        console.log('----------------------')
       }
       if (parsedResponse) {
         if (!parsedResponse.code) {
@@ -185,9 +189,9 @@ function sendJob (db, job, fablabs, fablabIndex, callback) {
             if (err) {
               callback(err)
             } else {
-              fs.unlink(job.file, function (err) { if (err) { console.log(err) } })
+               fs.unlink(job.file, function (err) { if (err) { console.log('unlink File');console.log(err);console.log('---------------------') } })
               if (job.auxFile) {
-                fs.unlink(job.auxFile, function (err) { if (err) { console.log(err) } })
+                fs.unlink(job.auxFile, function (err) { if (err) { console.log('unlink AuxFile');console.log(err);console.log('---------------------') } })
               }
               db.collection('fablabs').updateOne(
                   {'_id': fablab._id, 'jobs.details.machineId': job.machineId},
