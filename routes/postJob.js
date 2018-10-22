@@ -6,6 +6,7 @@ var getUserId = checkToken.getUserId
 
 function postJob (req, res) {
   var token = req.get('Authentication')
+  var init = Date.now()
   checkToken.checkToken(token, function (authorized, payload) {
     if (authorized && payload) {
       var job = req.query
@@ -50,7 +51,10 @@ function postJob (req, res) {
                           res.status(500)
                           res.json(err)
                         } else {
-                          res.json(job)
+                          var auxJob = JSON.parse(job)
+                          auxJob.init = init
+                          auxJob.end = Date.now()
+                          res.json(auxJob)
                         }
                       })
                     } else {
