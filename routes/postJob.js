@@ -51,10 +51,9 @@ function postJob (req, res) {
                           res.status(500)
                           res.json(err)
                         } else {
-                          var auxJob = JSON.parse(job)
-                          auxJob.init = init
-                          auxJob.end = Date.now()
-                          res.json(auxJob)
+                          job.init = init
+                          job.end = Date.now()
+                          res.json(job)
                         }
                       })
                     } else {
