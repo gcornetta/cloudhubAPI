@@ -46,12 +46,14 @@ function postJob (req, res) {
                       delete job.newtonUser
                       job.userCloudhub = getUserId(req.get('Authentication'))
                       job.fablabId = doc[0]._id
-                      sendJob(req.db, job, doc, 0, function (err, result) {
+                      sendJob(req.db, job, doc, 0, function (err, timeSend, timeRes) {
                         if (err) {
                           res.status(500)
                           res.json(err)
                         } else {
                           job.init = init
+                          job.send = timeSend
+                          job.res = timeRes
                           job.end = Date.now()
                           res.json(job)
                         }
@@ -166,7 +168,9 @@ function sendJob (db, job, fablabs, fablabIndex, callback) {
   delete queryString.file
   delete queryString.lat
   delete queryString.long
+  var timeSend = Date.now()
   request.post({url: 'http://' + fablab.api + ':' + fablab.port + '/fablab/jobs', qs: queryString, formData: formData}, function (err, res, body) {
+    var timeRes = Date.now()
     if (err) {
       if (fablabs[fablabIndex + 1]) {
         sendJob(db, job, fablabs, fablabIndex + 1, callback)
@@ -198,8 +202,13 @@ function sendJob (db, job, fablabs, fablabIndex, callback) {
               }
               db.collection('fablabs').updateOne(
                   {'_id': fablab._id, 'jobs.details.machineId': job.machineId},
-                  { $push: { 'jobs.details.$.jobs': job }, $inc: {'jobs.queued': 1} },
-                  callback)
+                  { $push: { 'jobs.details.$.jobs': job }, $inc: {'jobs.queued': 1} }, function (err){
+                    if (err){
+                        callback(err)
+                    }else{
+                        callback(null, timeSend, timeRes)
+                    }
+                  })
             }
           })
         } else {
