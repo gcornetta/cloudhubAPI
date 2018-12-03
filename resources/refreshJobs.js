@@ -17,6 +17,7 @@ function refreshJobs () {
 }
 
 function updateJobStatus (jobId, status, callback) {
+  console.log("Updating job status: "+jobId+" "+status)
   db.collection('jobs').updateOne({id: jobId}, {$set: {'status': status}}, function (err, res) {
     callback(err, res, jobId)
   })
