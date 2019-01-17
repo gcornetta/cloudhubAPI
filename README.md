@@ -41,8 +41,7 @@ Before installing the software you have to make sure that you comply with the ha
 <a name="hardware-prerequisites"></a>
 ## Hardware prerequisites
 <p align="justify">
-This software has been tested on a Raspberry Pi III Model B (amrv7 32-bit architecture) with a 8-GByte SD card. We strongly recommend using this Raspberry Pi model to avoid possible compilation errors of the GPIO module. You need at least 150 MBytes of free disk space to install the software.
-You also need to connect to your Raspberry Pi a current sensor to monitor the connected machine. You can find sensor specifications <a href="#hardware-architecture">here</a>.
+We recommend installing this software on an AWS <b>m4.large</b> EC2 instance or equivalent with at least 80GB Hard disk.
 </p>
 
 <a name="software-prerequisites"></a>
@@ -82,3 +81,20 @@ To install the Machine Wrapper module go through the following steps:
 <p align="justify">
   The server will listen to <b>port 3000</b>.
 </p>
+
+<a name="software-architecture"></a>
+# Software architecture
+<p align="justify">
+The Cloud Hub business software implements the application logic end exposes the main services through a set of REST APIs. Fig. 1 depicts the architecture of the Cloud Hub software. The application business logic is implemented on top of middleware functions that implement:
+1.	The API server logic.
+2.	The database wrapping logic.
+3.	The microservice interface (to manage communications with the Service Registry and the Service Monitor modules).
+The persitence layer is built on top of MongoDB NoSQL data base.
+</p>
+
+<figure>
+  <p align="center">
+    <img src="/docs/images/cloud-arch.png" alt="CLOUD HUB"/>
+    <figcaption>Fig. 1 - Cloud Hub Software Architecture.</figcaption>
+  </p>
+</figure>
