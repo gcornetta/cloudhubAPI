@@ -98,3 +98,9 @@ The persitence layer is built on top of MongoDB NoSQL data base.
     <figcaption>Fig. 1 - Cloud Hub Software Architecture.</figcaption>
   </p>
 </figure>
+
+
+<a name="documentation-and-developer-support"></a>
+# Dcoumentation and developer support
+<p align="justify">
+  </p>
