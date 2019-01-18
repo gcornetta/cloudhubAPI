@@ -22,11 +22,10 @@ This software is part of a larger suite of microservices designed to remotely ma
    * [Installation](#installation)
 2. [Software architecture](#software-architecture)
 3. [Documentation and developer support](#documentation-and-developer-support)
-   * [Fab Lab APIs](#fablab-apis)
-     + [Versioning](#versioning)
+   * [The Fab Lab object](#fablab-object)
+   * [Versioning](#versioning)
      + [Supported formats](#supported-formats)
      + [Error management](#error-management)
-     + [On-line documentation](#on-line-documentation)
      + [APIs responses](#api-responses)
 4. [Websites](#websites)
 5. [Contribution guidelines](#contribution-guidelines)
@@ -152,4 +151,87 @@ In our specific case, we expose a single object that represents a snapshot of th
 
 <p>
 The POST method supports <b>multipart/form-data</b> to upload the design file to the Cloud Hub server.
+</p>
+
+<a name="fablab-object"></a>
+# The Fab Lab object
+A Fab lab is modelled by a JSON object that includes the following information: 
+
+1.	The Fab Lab contact information, geographic position and service URL. 
+2.	The machines information (including type, vendor, status and queued jobs). 
+3.	The materials information (including type and quantity). 
+
+The Fab Lab JSON object is the following:
+
+```
+"fablab": {
+    "id": "The Fab Lab unique identifier",
+    "name": "The Fab Lab name",
+    "web": "The Fab Lab web page url",
+ "api": "The API endpoint of the Fab Lab gateway",
+    "capacity": "% of the total Fab Lab fabrication capacity", 
+    "address": {
+      "street": "The Fab Lab address",
+      "postCode": "The postcode",
+      "state": "The state or province", 
+      "country": "The country",
+      "countryCode": "State or country code"
+    }, 
+    "coordinates": {
+      "latitude": "The Fab Lab latitude", 
+      "longitude": "The Fab Lab longitude"
+    }, 
+    "contact": {
+      "name": "Name of the contact person", 
+      "charge": "Charge of the contact person", 
+      "email": "Email of the contact person"
+    }, 
+    "openingDays": [
+      {
+       "day": "Day of the week", 
+       "from": "Opening hour", 
+       "to": "Closing hour"
+      }
+    ], 
+    "equipment": [
+      {
+       "id": "The machine connection identifier",
+"type": "Machine type",
+       "vendor": "Machine vendor",
+       "name": "Machine name",
+       "status": "Machine status",
+       "jobsQueued": "The number of queued jobs"
+      }
+    ], 
+    "materials": [
+      {
+       "type": "Material type",
+       "quantity": "% of available stock"
+      }
+    ] 
+  },
+  "jobs": {
+    "running": "Number of total running jobs", 
+    "queued": "Number of total queued jobs", 
+    "details": [
+     {
+      "machineId": "The machine connection id",
+      "type": "Machine type", 
+      "vendor": "Vendor", 
+      "jobs": [
+        {
+         "id": "Job id",
+         "status": "Job status",
+         "process": "Type of fabrication process", 
+         "queue": "Local or global queue",
+         "queuePosition": "Position in queue"
+        }
+      ]
+     }
+    ]
+  }
+}
+```
+<p align="justify">
+The object is self-explanatory. Observe that the machine status may assume the following values: undefined, off, idle, busy. Conversely, the job status may assume the following values: running, completed, pending, approved, cancelled (either by the user or the Fab Lab administrator). The supported materials are: vinyl, wood, mylar, copper, cardboard. The supported machine types are: vinyl cutter, laser cutter, 3D printer, milling machine. The supported fabrication processes are: cut, halftone, wax. The process field is set to null for jobs sent to 3D printers. Finally, the supported vendors are: <b>epilog</b>, <b>prusa</b>, <b>gcc</b>, <b>roland</b>.
 </p>
