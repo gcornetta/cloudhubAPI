@@ -24,7 +24,7 @@ This software is part of a larger suite of microservices designed to remotely ma
 3. [Documentation and developer support](#documentation-and-developer-support)
    * [The Fab Lab object](#fablab-object)
    * [Versioning](#versioning)
-     + [Supported formats](#supported-formats)
+   * [Supported formats](#supported-formats)
      + [Error management](#error-management)
      + [APIs responses](#api-responses)
 4. [Websites](#websites)
@@ -196,7 +196,7 @@ The Fab Lab JSON object is the following:
     "equipment": [
       {
        "id": "The machine connection identifier",
-"type": "Machine type",
+       "type": "Machine type",
        "vendor": "Machine vendor",
        "name": "Machine name",
        "status": "Machine status",
@@ -233,5 +233,22 @@ The Fab Lab JSON object is the following:
 }
 ```
 <p align="justify">
-The object is self-explanatory. Observe that the machine status may assume the following values: undefined, off, idle, busy. Conversely, the job status may assume the following values: running, completed, pending, approved, cancelled (either by the user or the Fab Lab administrator). The supported materials are: vinyl, wood, mylar, copper, cardboard. The supported machine types are: vinyl cutter, laser cutter, 3D printer, milling machine. The supported fabrication processes are: cut, halftone, wax. The process field is set to null for jobs sent to 3D printers. Finally, the supported vendors are: <b>epilog</b>, <b>prusa</b>, <b>gcc</b>, <b>roland</b>.
+The object is self-explanatory. Observe that the machine status may assume the following values: <b>undefined</b>, <b>off</b>, <b>idle</b>, <b>busy</b>. Conversely, the job status may assume the following values: <b>running</b>, <b>completed</b>, <b>pending</b>, <b>approved</b>, <b>cancelled</b> (either by the user or the Fab Lab administrator). The supported materials are: <b>vinyl</b>, <b>wood</b>, <b>mylar</b>, <b>copper</b>, <b>cardboard</b>. The supported machine types are: <b>vinyl cutter</b>, <b>laser cutter</b>, <b>3D printer</b>, <b>milling machine</b>. The supported fabrication processes are: <b>cut</b>, <b>halftone</b>, <b>wax</b>. The process field is set to null for jobs sent to 3D printers. Finally, the supported vendors are: <b>epilog</b>, <b>prusa</b>, <b>gcc</b>, <b>roland</b>.
 </p>
+
+<a name="versioning"></a>
+## Versioning
+
+API versioning is not mandatory for Cloud Hub APIs.
+
+<a name="supported-formats"></a>
+## Supported formats
+
+APIs only support JSON format; however, they are designed to implement content negotiation and to support more formats in the future. Content negotiation is implemented using a query parameter in the resource URI rather than using the accept field in the incoming HTML request, namely:
+
+```
+/fablabs/1234/?format=json
+```
+
+`?format=json` is the default value, so if no format is specified in the query parameter of the resource URI, server response will be in JSON.
+
