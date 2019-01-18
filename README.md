@@ -270,7 +270,36 @@ _Pagination_ allows to return just part of the database content using the limit 
 <p align="justify">
 gets 20 database records from 30 to 50. The server response should also include metadata to specify the total number of records available. If no limit and offset parameters are specified the default query values are <code>limit=10&offset=0</code>.
 </p>  
-</p>
 
 <a name="search"></a>
 ## Search
+
+<p align="justify">
+Both simple and scoped searches are supported using the verb <b>q</b>. Global searches across resources are not supported since our implementation has a single resource (i.e. the Fab Lab object). A simple search can be performed as follows:
+</p>
+```
+/fablabs?q=laser%20cutter+epilog
+```
+<p align="justify">
+The previous query returns all the fab labs that have an epilog laser cutter. To perform a scoped search, one can use the following query:
+</p>
+
+```
+/fablabs/12345/jobs?q=laser%20cutter+queue
+```
+<p align="justify">
+The previous query returns all the queued jobs on all the laser cutters of the fab lab whose <b>id</b> is <b>12345</b>.
+The search results can be explicitly formatted using a parameter in the query string. If this parameter is omitted, the server will return a response in the default format (i.e. JSON). Observe that this feature is implemented only for future improvements since the only format supported by the API server is JSON. To specify the output format, use the following URI:
+</p>
+
+```
+/fablabs?format=json&q=laser%20cutter+epilog
+```
+<p align="justify">
+Finally, observe that the ‘+’ character in the resource URI is automatically converted into a blank space (code <code>%20</code>) when the URI is parsed by the server middleware. In order to override this behaviour and to allow the expected operation of the business logic on the server side, the ‘+’ character is encoded (code <code>%2B</code>); thus, for example, the previous resource URI is encoded as:
+</p>
+
+```
+/fablabs?format=json&q=laser%20cutter%2Bepilog
+```
+
