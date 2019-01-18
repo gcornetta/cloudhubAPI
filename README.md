@@ -303,3 +303,36 @@ Finally, observe that the ‘+’ character in the resource URI is automatically
 /fablabs?format=json&q=laser%20cutter%2Bepilog
 ```
 
+<a name="error-management"></a>
+## Error management
+
+The API error codes will match HTTP codes. The following cases are managed:
+
+1.	Everything worked (_success_): **200–OK**.
+2.	The application did something wrong (_client error_): **400–Bad Request**. 
+3.	The API did something wrong (_server error_): **500–Internal Server Error**.
+
+<p align="justify">
+In the case of <b>client error</b>, the server will return in the response a JSON object with error details and hints to correct it. The message has the following format:
+</p>
+
+```
+{“message”: “verbose error explanation”, “errorCode”: 12345, “infoLink”: “link to the developer suppor page”}
+```
+The object must redirect to a web page with hints to developers on how to solve the issue.
+
+<p align="justify">
+The error management system must also handle the case in which the client intercepts HTTP error versions (this is the case of some versions of Adobe Flash). In order to allow the developer to intercept error codes, the resource URI must have an optional flag (by default set to <code>false</code>) to suppress response error codes. When this flag is true the HTTP response will be always <code>200 –OK</code> and the response will contain a JSON object with the error details. To enable error code suppression, you can use a query in the resource URI as follows:
+</p>
+
+```
+/fablabs/1234?suppress_response_codes=true&job=1235
+```
+
+<p align="justify">
+We use Twitter API style; thus, the URI is deliberately verbose to highlight the effect on the response codes. The server response contains a JSON object with the error details, for example:
+</p>
+
+```
+{“error”: “Unable to delete. The job you specified does not exist.”}
+```
