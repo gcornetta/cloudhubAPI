@@ -28,6 +28,7 @@ This software is part of a larger suite of microservices designed to remotely ma
    * [Pagination and partial response](#pagination)
    * [Search](#search)
    * [Error management](#error-management)
+   * [API responses](#api-responses)
 4. [Websites](#websites)
 5. [Contribution guidelines](#contribution-guidelines)
 6. [License](#license)
@@ -335,4 +336,159 @@ We use Twitter API style; thus, the URI is deliberately verbose to highlight the
 
 ```
 {“error”: “Unable to delete. The job you specified does not exist.”}
+```
+
+<a name="api-responses"></a>
+## API responses
+
+### Tell me about a partcular Fab Lab
+
+```
+GET /fablabs/1234
+```
+
+_Response_:
+
+```
+200 OK
+
+{
+“fablab”: {
+  “id”: 1234
+  .... 
+},
+ “jobs”: {
+  ....
+ }
+}
+
+```
+
+### Tell me about all the Fab Labs
+
+```
+GET /fablabs
+```
+
+_Response_:
+
+```
+200 OK
+
+{
+“fablabs”: [
+ {
+  “fablab”: {
+    “id”: 1234
+    .... 
+  },
+  “jobs”: 
+  {
+   ....
+  }
+ },
+ {
+  “fablab”: {
+    “id”: 1235
+    .... 
+  },
+  “jobs”: {
+   ....
+  }
+ }
+],
+“_metadata”: [
+  {“totalCount”: 500, “limit”: 10, “offset”: 0}
+]}
+
+```
+Observe that the response also includes a **\_metadata** object with the following fields:
+
+1. `totalCount`: the total number of records in the database
+2. `limit`: the number of records displayed in the response
+3. `offset`: the offset with respect the first element of the database (an offset of 0 means that the records are displayed starting from the first element of the database)
+
+### Submit a job
+
+```
+POST /fablabs/jobs?machine=laser%20cutter&process=cut&material =wood&lat=xx&long=yy
+```
+
+_Response_:
+
+```
+200 OK
+
+{
+ “fablab”: {
+   “id”: 1234
+   “name”: “Fab Lab Name”
+   “address” : {....},
+   “coordinates”: {....},
+   “contact”: {....},
+   “openingDays”: {....}
+  },
+  “job”: {
+    “id”: 1235,
+    “status”: “pending”,
+    “process”: “cut”,
+    “queue”: “global”,
+    “queuePosition”: 1,
+    “machine”: {
+      “machineId”: 12345,
+      “type”: “laser cutter”,
+      “vendor”: “Epilog”
+    }
+  }
+}
+
+```
+<p align="justify">
+Recall, that with this method a design file in <b>PNG</b> (i.e. a graphic format) or <b>GCODE</b> (i.e. a text format) format is uploaded on the server. In the case of PNG format, our API specifications correspond to the HTTP request depicted below.  
+</p>
+
+```
+POST /fablabs/
+Host: api.cloudhub.uspcloud.eu/uploads
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundaryqzByvokjOTfF9UwD
+Content-Length: 204
+
+------WebKitFormBoundaryqzByvokjOTfF9UwD
+Content-Disposition: form-data; name="design"; filename="design.png"
+Content-Type: image/png
+
+File contents go here.
+
+------WebKitFormBoundaryqzByvokjOTfF9UwD--
+```
+
+### Tell me about a job
+
+```
+GET /fablabs/1234?job=1235
+```
+
+_Response_:
+
+```
+200 OK
+
+{
+ “job”: {
+   “id”: 1235,
+   “status”: “pending”,
+   “machine”: {....}
+}
+```
+
+### Cancel a job
+
+```
+DELETE /fablabs/1234?job=1235
+```
+
+_Response_:
+
+```
+200 OK
 ```
