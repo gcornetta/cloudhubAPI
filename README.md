@@ -25,8 +25,9 @@ This software is part of a larger suite of microservices designed to remotely ma
    * [The Fab Lab object](#fablab-object)
    * [Versioning](#versioning)
    * [Supported formats](#supported-formats)
-     + [Error management](#error-management)
-     + [APIs responses](#api-responses)
+   * [Pagination and partial response](#pagination)
+   * [Search](#search)
+   * [Error management](#error-management)
 4. [Websites](#websites)
 5. [Contribution guidelines](#contribution-guidelines)
 6. [License](#license)
@@ -252,3 +253,24 @@ APIs only support JSON format; however, they are designed to implement content n
 
 `?format=json` is the default value, so if no format is specified in the query parameter of the resource URI, server response will be in JSON.
 
+<a name="pagination"></a>
+## Pagination and partial response
+
+_Partial response_ allows to give the developers just the information they need from the API. For example:
+```
+/fablabs/1234?fields=id,name,api
+```
+displays just the **id**, the **name** and the **api** fields of the Fab Lab JSON object. 
+
+_Pagination_ allows to return just part of the database content using the limit and the offset parameters. For example:
+
+```
+/fablabs?limit=20&offset=30
+```
+<p align="justify">
+gets 20 database records from 30 to 50. The server response should also include metadata to specify the total number of records available. If no limit and offset parameters are specified the default query values are <code>limit=10&offset=0</code>.
+</p>  
+</p>
+
+<a name="search"></a>
+## Search
