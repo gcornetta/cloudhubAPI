@@ -101,6 +101,55 @@ The persitence layer is built on top of MongoDB NoSQL data base.
 
 
 <a name="documentation-and-developer-support"></a>
-# Dcoumentation and developer support
+# Documentation and developer support
 <p align="justify">
-  </p>
+The Cloud Hub APIs expose the underlying Fab Lab network as software service over the internet and represent the interface between the Fab Lab cloud and third-party applications and platforms allowing the possibility to seamlessly implement complex multi-cloud architecture that communicates and synchronize through APIs.  
+</p>
+
+<p align="justify">
+The Cloud Hub APIs provide software methods that can be exploited to remotely control the whole Fab Lab network using custom interfaces. 
+In our specific case, we expose a single object that represents a snapshot of the Fab Lab status and of the available fabrication resources.  Table 1 displays the resource URI and the implemented HTTP verbs for some of the APIs. 
+</p>
+
+<table>
+  <caption>Table 1: Fab Lab APIs</caption>
+  <tr>
+    <th>Resource</th>
+    <th>GET</th>
+    <th>POST</th>
+    <th>PUT</th>
+    <th>DELETE</th>
+  </tr>
+  <tr>
+    <td>/fablab/1234</td>
+    <td>Shows the Fab Lab with the specified id if it exists</td>
+    <td>Error 400 <br>(<span style="font-weight:bold">Bad Request</span>)</td>
+    <td>Error 400 <br>(<span style="font-weight:bold">Bad Request</span>)</td>
+    <td>Error 400<br>(<span style="font-weight:bold">Bad Request</span>)</td>
+  </tr>
+  <tr>
+    <td>/fablabs</td>
+    <td>Show all the Fab Labs</td>
+    <td>Error 400 <br>(<span style="font-weight:bold">Bad Request</span>)</td>
+    <td>Error 400 <br>(<span style="font-weight:bold">Bad Request</span>)</td>
+    <td>Error 400<br>(<span style="font-weight:bold">Bad Request</span>)</td>
+  </tr>
+  <tr>
+    <td>/fablabs/jobs?machine=laser%20cutter&process=cut&lat=xx&long=yy</td>
+    <td>Submit a job to the Fab Lab closest to the specified coordinates</td>
+    <td>Error 400<br>(<span style="font-weight:bold">Bad Request</span>)</td>
+    <td>Error 400<br>(<span style="font-weight:bold">Bad Request</span>)</td>
+    <td>Error 400<br>(<span style="font-weight:bold">Bad Request</span>)</td>
+  </tr>
+  <tr>
+    <td>/v1/fablabs/1234?job=1235</td>
+    <td>Shows the status of the specified job if it exists; otherwise displays an error (Not found)</td>
+    <td>Error 400 <br>(<span style="font-weight:bold">Bad Request</span>)</td>
+    <td>Error 400 <br>(<span style="font-weight:bold">Bad Request</span>)</td>
+    <td>Delete a job if it exists; otherwise displays an error (Not found</td>
+  </tr>
+</table>
+
+<p>
+The POST method supports <b>multipart/form-data</b> to upload the design file to the Cloud Hub server.
+</p>
