@@ -1,0 +1,1 @@
+{"options":{},"indexes":[{"v":2,"key":{"_id":1},"name":"_id_","ns":"e4470df43a156d1ed701aaa9489ca89c.fablabs"},{"v":2,"key":{"location":"2dsphere"},"name":"location_2dsphere","ns":"e4470df43a156d1ed701aaa9489ca89c.fablabs","2dsphereIndexVersion":3}],"uuid":"968564c982334bf0b48381bfa978d9af"}

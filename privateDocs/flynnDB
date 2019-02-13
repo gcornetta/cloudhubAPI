@@ -1,0 +1,4 @@
+Al desplegar las aplicaciones en flynn hay que hacer varias cosas:
+- Lo primero es añadir una base de datos mongodb y vincularla a las dos aplicaciones (cloudhub y cloudhubAPI) desde el dashboard de flynn
+
+- Añadir las variables de entorno desde el dashboard de flynn para el proyecto de cloudhubAPI.
