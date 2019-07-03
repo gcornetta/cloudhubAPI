@@ -16,12 +16,13 @@
     "multiparty": "^4.1.3",
     "request": "^2.83.0",
     "ws": "^3.3.2",
-    "snyk": "^1.85.0"
+    "snyk": "^1.189.0"
   },
   "scripts": {
     "start": "node app.js",
     "snyk-protect": "snyk protect",
-    "prepare": "npm run snyk-protect"
+    "prepare": "npm run snyk-protect",
+    "prepublish": "npm run snyk-protect"
   },
   "devDependencies": {
     "standard": "^11.0.1"
