@@ -278,6 +278,7 @@ gets 20 database records from 30 to 50. The server response should also include 
 <p align="justify">
 Both simple and scoped searches are supported using the verb <b>q</b>. Global searches across resources are not supported since our implementation has a single resource (i.e. the Fab Lab object). A simple search can be performed as follows:
 </p>
+
 ```
 /fablabs?q=laser%20cutter+epilog
 ```
