@@ -143,7 +143,7 @@ In our specific case, we expose a single object that represents a snapshot of th
     <td>Error 400<br>(<span style="font-weight:bold">Bad Request</span>)</td>
   </tr>
   <tr>
-    <td>fablabs/1234?job=1235</td>
+    <td>/fablabs/1234?job=1235</td>
     <td>Shows the status of the specified job if it exists; otherwise displays an error (Not found)</td>
     <td>Error 400 <br>(<span style="font-weight:bold">Bad Request</span>)</td>
     <td>Error 400 <br>(<span style="font-weight:bold">Bad Request</span>)</td>
