@@ -137,13 +137,13 @@ In our specific case, we expose a single object that represents a snapshot of th
   </tr>
   <tr>
     <td>/fablabs/jobs?machine=laser%20cutter&process=cut&lat=xx&long=yy</td>
-    <td>Submit a job to the Fab Lab closest to the specified coordinates</td>
     <td>Error 400<br>(<span style="font-weight:bold">Bad Request</span>)</td>
+    <td>Submit a job to the Fab Lab closest to the specified coordinates</td>
     <td>Error 400<br>(<span style="font-weight:bold">Bad Request</span>)</td>
     <td>Error 400<br>(<span style="font-weight:bold">Bad Request</span>)</td>
   </tr>
   <tr>
-    <td>/v1/fablabs/1234?job=1235</td>
+    <td>fablabs/1234?job=1235</td>
     <td>Shows the status of the specified job if it exists; otherwise displays an error (Not found)</td>
     <td>Error 400 <br>(<span style="font-weight:bold">Bad Request</span>)</td>
     <td>Error 400 <br>(<span style="font-weight:bold">Bad Request</span>)</td>
