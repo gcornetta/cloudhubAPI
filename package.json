@@ -10,7 +10,7 @@
     "fs": "0.0.1-security",
     "jsonwebtoken": "^8.1.0",
     "jws-jwk": "^0.1.4",
-    "method-override": "^2.3.10",
+    "method-override": "^3.0.0",
     "mongodb": "^2.2.33",
     "morgan": "^1.0.0",
     "multiparty": "^4.1.3",
